@@ -20,7 +20,40 @@ code-annotations: hover
 execute:
   warning: false
   message: false
+  echo: true
 ---
 
-# Contexto
+# Universo Tidymodels
+
+Os pacotes principais do **tidymodels** trabalham juntos para permitir uma ampla variedade de abordagens de modelagem e eles são:
+
+- **rsample** que fornece infraestrutura para divisão e reamostragem eficiente de dados;
+
+- **parnsip** é uma interface organizada e unificada para modelos que pode ser usada para testar uma variedade de modelos sem se prender às minúcias sintáticas dos pacotes subjacentes;
+
+- **recipes** é uma interface organizada para ferramentas de pré-processamento de dados para engenharia de recursos;
+
+- **workflows** (fluxos de trabalho) agrupam pré-processamento, modelagem e pós-processamento;
+
+- **tune** ajuda a otimizar os hiperparâmetros do seu modelo e as etapas de pré-processamento;
+
+- **yardstick** (critério) mede a eficácia dos modelos usando métricas de desempenho;
+
+- **broom** converte as informações em objetos R estatísticos comuns em formatos previsíveis e fáceis de usar;
+
+- **dials** cria e gerencia parâmetros de ajuste e grades de parâmetros.
+
+A estrutura tidymodels também inclui muitos outros pacotes projetados para análise de dados especializada e tarefas de modelagem. Eles não são carregados automaticamente com library(tidymodels), então você precisará carregar cada um com sua própria chamada para library(). 
+
+# Pacote: yardstick
+
+A versão 1.3.0 do Yardstick introduziu uma implementação para **métricas de grupo**. O caso de uso que motiva a implementação desta funcionalidade são as métricas de justiça, embora as métricas de grupo tenham aplicações além desse domínio. As métricas de justiça quantificam o grau de disparidade em um valor de métrica entre grupos. 
+
+
+```{r}
+library(yardstick)
+library(dplyr)
+
+data("hpc_cv")
+```
 
