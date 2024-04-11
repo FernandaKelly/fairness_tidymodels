@@ -49,11 +49,47 @@ A estrutura tidymodels também inclui muitos outros pacotes projetados para aná
 
 A versão 1.3.0 do Yardstick introduziu uma implementação para **métricas de grupo**. O caso de uso que motiva a implementação desta funcionalidade são as métricas de justiça, embora as métricas de grupo tenham aplicações além desse domínio. As métricas de justiça quantificam o grau de disparidade em um valor de métrica entre grupos. 
 
+A título de exemplo vamos utilizar o conjunto de dados **hpc_cv**, contendo probabilidades de classe e previsões de classe para uma análise discriminante linear ajustada ao conjunto de dados HPC de Kuhn e Johnson (2013). 
+
 
 ```{r}
 library(yardstick)
 library(dplyr)
-
-data("hpc_cv")
 ```
+
+## Dados
+
+Esses dados são os conjuntos de avaliação de um esquema de validação cruzada de 10 vezes. Este quadro de dados possui as variáveis de **classe verdadeira** (obs), a **previsão da classe** (pred) e as **colunas para cada probabilidade de classe** (colunas VF, F, M e L). Além disso, é incluída uma coluna para o **indicador de reamostragem** (resample).
+
+```{r}
+dados_exemplo1 <- tibble::tibble(yardstick::hpc_cv)
+head(dados_exemplo1, 5)
+```
+
+Para os propósitos do exemplo, também adicionaremos uma coluna denominada por **batch** aos dados e selecionaremos as colunas para as probabilidades de classe, das quais não precisamos.
+
+```{r}
+set.seed(1)
+
+hpc <- dados_exemplo1 %>% 
+       dplyr::mutate(batch = base::sample(c("a", "b"), nrow(.), replace = TRUE)) %>% 
+       select(-c(VF, F, M, L))
+```
+
+
+## Conscientização de grupo
+
+Mesmo antes da implementação das métricas de grupo, todas as métricas de referência já tinham consciência do grupo. Quando dados agrupados são passados para uma métrica com reconhecimento de grupo, eles retornarão valores de métrica calculados para cada grupo. LOgo, se temos 10 folds, e se quiséssemos calcular a precisão do modelo reamostrado, poderíamos escrever:
+
+```{r}
+hpc %>% 
+  dplyr::group_by(Resample) %>%
+  yardstick::accuracy(obs, pred)
+```
+
+
+Veja que aqui
+
+
+
 
