@@ -79,7 +79,7 @@ hpc <- dados_exemplo1 %>%
 
 ## Conscientização de grupo
 
-Mesmo antes da implementação das métricas de grupo, todas as métricas de referência já tinham consciência do grupo. Quando dados agrupados são passados para uma métrica com reconhecimento de grupo, eles retornarão valores de métrica calculados para cada grupo. LOgo, se temos 10 folds, e se quiséssemos calcular a precisão do modelo reamostrado, poderíamos escrever:
+Mesmo antes da implementação das métricas de grupo, todas as métricas de referência já tinham consciência do grupo. Quando dados agrupados são passados para uma métrica com reconhecimento de grupo, eles retornarão valores de métrica calculados para cada grupo. Logo, se temos 10 folds, e se quiséssemos calcular a precisão do modelo reamostrado, poderíamos escrever:
 
 ```{r}
 hpc %>% 
@@ -88,7 +88,7 @@ hpc %>%
 ```
 
 
-Veja que aqui
+Veja que aqui nós temos como produto a estimação da acurácia de cada fold.
 
 
 
