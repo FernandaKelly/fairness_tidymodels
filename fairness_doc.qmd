@@ -239,7 +239,20 @@ O que o resultado **.estimate** está nos contando?
 
 Um valor 0 (ou próximo de 0) indica paridade entre os grupos. Observe que esta definição não depende do verdadeiro resultado. O parâmetro **truth** é incluído nas métricas geradas para fins de consistência.
 
+Esse resultado é esperado, visto que todos os folds estão balanceados de acordo com o número de observações.
+
+```{r}
+table(hpc$Resample)
+```
+
+
 # equal_opportunity()
 
 # equalized_odds()
 :::
+
+# Exemplos
+
+## Are GPT detectors fair? A machine learning fairness case study
+
+## Fair prediction of hospital readmission: a machine learning fairness case study
