@@ -1,5 +1,5 @@
 ---
-title: "Fainesse" # Título do relatório
+title: "Fairness" # Título do relatório
 subtitle: "**Fairness com Tidymodels**"
 author: "Fernanda Kelly R. Silva | www.fernandakellyrs.com"
 lang: pt 
@@ -27,30 +27,29 @@ execute:
 
 Os pacotes principais do **tidymodels** trabalham juntos para permitir uma ampla variedade de abordagens de modelagem e eles são:
 
-- **rsample** que fornece infraestrutura para divisão e reamostragem eficiente de dados;
+-   **rsample** que fornece infraestrutura para divisão e reamostragem eficiente de dados;
 
-- **parnsip** é uma interface organizada e unificada para modelos que pode ser usada para testar uma variedade de modelos sem se prender às minúcias sintáticas dos pacotes subjacentes;
+-   **parnsip** é uma interface organizada e unificada para modelos que pode ser usada para testar uma variedade de modelos sem se prender às minúcias sintáticas dos pacotes subjacentes;
 
-- **recipes** é uma interface organizada para ferramentas de pré-processamento de dados para engenharia de recursos;
+-   **recipes** é uma interface organizada para ferramentas de pré-processamento de dados para engenharia de recursos;
 
-- **workflows** (fluxos de trabalho) agrupam pré-processamento, modelagem e pós-processamento;
+-   **workflows** (fluxos de trabalho) agrupam pré-processamento, modelagem e pós-processamento;
 
-- **tune** ajuda a otimizar os hiperparâmetros do seu modelo e as etapas de pré-processamento;
+-   **tune** ajuda a otimizar os hiperparâmetros do seu modelo e as etapas de pré-processamento;
 
-- **yardstick** (critério) mede a eficácia dos modelos usando métricas de desempenho;
+-   **yardstick** (critério) mede a eficácia dos modelos usando métricas de desempenho;
 
-- **broom** converte as informações em objetos R estatísticos comuns em formatos previsíveis e fáceis de usar;
+-   **broom** converte as informações em objetos R estatísticos comuns em formatos previsíveis e fáceis de usar;
 
-- **dials** cria e gerencia parâmetros de ajuste e grades de parâmetros.
+-   **dials** cria e gerencia parâmetros de ajuste e grades de parâmetros.
 
-A estrutura tidymodels também inclui muitos outros pacotes projetados para análise de dados especializada e tarefas de modelagem. Eles não são carregados automaticamente com library(tidymodels), então você precisará carregar cada um com sua própria chamada para library(). 
+A estrutura tidymodels também inclui muitos outros pacotes projetados para análise de dados especializada e tarefas de modelagem. Eles não são carregados automaticamente com library(tidymodels), então você precisará carregar cada um com sua própria chamada para library().
 
 # Pacote: yardstick
 
-A versão 1.3.0 do Yardstick introduziu uma implementação para **métricas de grupo**. O caso de uso que motiva a implementação desta funcionalidade são as métricas de justiça, embora as métricas de grupo tenham aplicações além desse domínio. As métricas de justiça quantificam o grau de disparidade em um valor de métrica entre grupos. 
+A versão 1.3.0 do Yardstick introduziu uma implementação para **métricas de grupo**. O caso de uso que motiva a implementação desta funcionalidade são as métricas de justiça, embora as métricas de grupo tenham aplicações além desse domínio. As métricas de justiça quantificam o grau de disparidade em um valor de métrica entre grupos.
 
-A título de exemplo vamos utilizar o conjunto de dados **hpc_cv**, contendo probabilidades de classe e previsões de classe para uma análise discriminante linear ajustada ao conjunto de dados HPC de Kuhn e Johnson (2013). 
-
+A título de exemplo vamos utilizar o conjunto de dados **hpc_cv**, contendo probabilidades de classe e previsões de classe para uma análise discriminante linear ajustada ao conjunto de dados HPC de Kuhn e Johnson (2013).
 
 ```{r}
 library(yardstick)
@@ -76,7 +75,6 @@ hpc <- dados_exemplo1 %>%
        select(-c(VF, F, M, L))
 ```
 
-
 ## Conscientização de grupo
 
 Mesmo antes da implementação das métricas de grupo, todas as métricas de referência já tinham consciência do grupo. Quando dados agrupados são passados para uma métrica com reconhecimento de grupo, eles retornarão valores de métrica calculados para cada grupo. Logo, se temos 10 folds, e se quiséssemos calcular a precisão do modelo reamostrado, poderíamos escrever:
@@ -87,9 +85,58 @@ hpc %>%
   yardstick::accuracy(obs, pred)
 ```
 
+Veja que aqui nós temos como produto a estimação da acurácia de cada fold ou grupo de interesse. Esse comportamento é o que entendemos por consciência de grupo.
 
-Veja que aqui nós temos como produto a estimação da acurácia de cada fold.
+# Métricas de grupo
 
+As métricas de grupo são associadas a uma coluna de dados de modo que, quando os dados são transmitidos a essa coluna, a métrica agrupará temporariamente por essa coluna, calculará valores para cada um dos grupos definidos pela coluna e, em seguida, agregará os valores calculados para o agrupamento temporário de volta ao nível de agrupamento dos dados de entrada.
 
+Suponha que os **batch** nos dados representem dois grupos para os quais o desempenho do modelo não deva diferir. Para quantificar o grau em que o desempenho do modelo difere para esses dois grupos, poderíamos calcular os valores de precisão para cada grupo separadamente e, em seguida, calcular a diferença. Veja o exemplo abaixo.
 
+```{r}
+acc_by_group <- hpc %>% 
+                dplyr::filter(Resample == "Fold01") %>%
+                dplyr::group_by(batch) %>%
+                yardstick::accuracy(obs, pred)
+acc_by_group
+```
 
+Vamos observar a diferença entre os **batch**:
+
+```{r}
+base::diff(c(acc_by_group$.estimate[2], acc_by_group$.estimate[1]))
+```
+
+As métricas de grupo codificam a função **group_by()**, etapa de agregação amostrada acima em uma métrica de critério. Podemos definir uma nova métrica groupwise com a função **new_groupwise_metric()** do pacote new_groupwise_metric.
+
+Vamos entender os parâmetros dessa função?
+
+-   fn: Uma função métrica de critério ou conjunto de métricas. As métricas disponíveis no pacote são diversas, mas algumas delas são:
+
+    -   detection_prevalence
+    -   accuracy
+    -   average_precision
+    -   classification_cost
+    -   poisson_log_loss
+    -   precision
+    -   roc_auc
+    -   recall
+    -   rmse
+    -   sens
+    -   spec
+
+-   name: O nome da métrica a ser colocada na coluna .metric da saída.
+
+-   aggregate: Uma função para resumir os resultados do conjunto de métricas gerado. A função pega os resultados do conjunto de métricas como o primeiro argumento e retorna um único valor numérico fornecendo o valor **.estimate** como saída.
+
+O parâmetro fn Veja o exemplo abaixo:
+
+```{r}
+accuracy_diff <- yardstick::new_groupwise_metric(
+                               fn = accuracy,
+                               name = "accuracy_diff",
+                               aggregate = function(acc_by_group){
+                               base::diff(c(acc_by_group$.estimate[2], acc_by_group$.estimate[1]))  
+                               }
+)
+```
