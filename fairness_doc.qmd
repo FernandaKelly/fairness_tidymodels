@@ -148,6 +148,7 @@ Veja que a saída **accuracy_diff** é um objeto da classe **metric_factory**.
 ```{r}
 class(accuracy_diff)
 ```
+
 A partir de agora a função **accuracy_diff** sabe como obter valores de acurácia para cada grupo e depois retornar a diferença entre a acurácia do primeira e do segundo resultado como saída.
 
 A última coisa que precisamos associar ao objeto é o nome da variável de agrupamento para a qual passar **group_by()**. Podemos passar o nome da variável para **accuracy_diff** fazer isso:
@@ -156,6 +157,7 @@ A última coisa que precisamos associar ao objeto é o nome da variável de agru
 accuracy_diff_by_batch <- accuracy_diff(batch)
 accuracy_diff_by_batch
 ```
+
 Logo, podemos usar a a**ccuracy_diff_by_batch()** como métrica da mesma forma que usaríamos **accuracy()**. Veja o exemplo abaixo:
 
 ```{r}
@@ -163,6 +165,7 @@ hpc %>%
   dplyr::filter(Resample == "Fold01") %>%
   accuracy_diff_by_batch(obs, pred)
 ```
+
 Também podemos adicionar **accuracy_diff_by_batch()** aos conjuntos de métricas:
 
 ```{r}
@@ -191,32 +194,52 @@ As métricas de grupo formam o *back-end* das métricas de fairness em modelos o
 # Métricas Fairness
 
 ::: panel-tabset
-
 # demographic_parity()
 
-A função **demographic_parity** tem o objetivo que avaliar a paridade demográfica e essa é sastifeita quando as previsões de um modelo têm a mesma taxa positiva prevista entre os grupos. 
+A função **demographic_parity** tem o objetivo que avaliar a paridade demográfica e essa é sastifeita quando as previsões de um modelo têm a mesma taxa positiva prevista entre os grupos.
 
 Seu único parâmetro é:
 
-- by: O identificador de coluna do recurso confidencial. Este deve ser um nome de coluna sem aspas, referindo-se a uma coluna nos dados não pré-processados.
+-   by: O identificador de coluna do recurso confidencial. Este deve ser um nome de coluna sem aspas, referindo-se a uma coluna nos dados não pré-processados.
 
 Vamos entender um pouco mais?
 
-Esta função gera uma função métrica de **critério de justiça**. Dada uma variável de agrupamento **by**, a função **demographic_parity()** retornará uma função métrica de critério, como vimos anteriormente, que está associada ao agrupamento de variáveis de dados  do parâmetro **by** e a um pós-processador. 
+Esta função gera uma função métrica de **critério de justiça**. Dada uma variável de agrupamento **by**, a função **demographic_parity()** retornará uma função métrica de critério, como vimos anteriormente, que está associada ao agrupamento de variáveis de dados do parâmetro **by** e a um pós-processador.
 
-A função gerada primeiro gerará um conjunto de valores de métrica de  **detection_prevalence** por grupo antes de resumir entre os grupos usando a função de pós-processamento.
+A função gerada primeiro gerará um conjunto de valores de métrica de **detection_prevalence** por grupo antes de resumir entre os grupos usando a função de pós-processamento.
 
 **A função gerada possui apenas um método de quadro de dados e deve ser usada como parte de um conjunto de métricas.**
 
+Por padrão, essa função considera a diferença no intervalo da métrica **detection_prevalence** a partir do **.estimate** entre os grupos. O que significa que a disparidade entre pares entre os grupos é o valor de retorno da função.
+
+Veja o exemplo abaixo.
+
+-   (1°) Vamos atualizar o grupo de métricas:
+
+```{r}
+acc_ms <- yardstick::metric_set(sens, accuracy, accuracy_diff_by_batch, demographic_parity(Resample))
+acc_ms
+```
+
+Vamos utilizar a variável **Resample** como indicação de grupos.
+
+-   (2°) Aplicando a base de dados:
+
+```{r}
+hpc %>%
+  acc_ms(truth = obs, estimate = pred)
+```
+
+O que o resultado **.estimate** está nos contando?
+
+| .metric            | **.estimator** | **.estimate** | **.by**  |
+|:-------------------|----------------|---------------|----------|
+| demographic_parity | macro          | 2.775558e-17  | Resample |
 
 
+Um valor 0 (ou próximo de 0) indica paridade entre os grupos. Observe que esta definição não depende do verdadeiro resultado. O **truth** argumento é incluído nas métricas geradas para fins de consistência.
 
 # equal_opportunity()
 
 # equalized_odds()
-
-
-
-
-
 :::
