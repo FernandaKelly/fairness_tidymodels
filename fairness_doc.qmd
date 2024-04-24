@@ -245,10 +245,50 @@ Esse resultado é esperado, visto que todos os folds estão balanceados de acord
 table(hpc$Resample)
 ```
 
-
 # equal_opportunity()
 
+A função **equal_opportunity()** é satisfeita quando as previsões de um modelo têm as mesmas taxas de verdadeiros positivos e falsos negativos em todos os grupos protegidos. 
+
+O cálculo dessa função é baseado na diferença entre o maior e o menor valor da função **sens()** entre grupos, em que **sens()** calcula a sensibilidade de uma mensuração para um resultado de referência (o parâmetro "truth" ou algum padrão ouro).
+
+O parâmetro da função é idêntico ao da função **demographic_parity()**. 
+
+Vamos ao exemplo?
+
+Assim como no exemplo anterior, precisamos acrescentar a métrica no vetor de métricas que desejamos calcular..
+
+```{r}
+acc_ms <- yardstick::metric_set(sens, accuracy, accuracy_diff_by_batch,
+                                demographic_parity(Resample), equal_opportunity(Resample))
+acc_ms
+```
+
+Um valor 0 indica paridade entre os grupos e o nosso resultado indica que há igualdade de oportunidades.
+
+```{r}
+hpc %>%
+  acc_ms(truth = obs, estimate = pred)
+```
+
 # equalized_odds()
+
+As probabilidades equalizadas são satisfeitas quando as previsões de um modelo têm as mesmas taxas de falsos positivos, verdadeiros positivos, falsos negativos e verdadeiros negativos em todos os grupos protegidos.
+
+
+Assim como no exemplo anterior, precisamos acrescentar a métrica no vetor de métricas que desejamos calcular..
+
+```{r}
+acc_ms <- yardstick::metric_set(sens, accuracy, accuracy_diff_by_batch,
+                                demographic_parity(Resample), equal_opportunity(Resample), equalized_odds(Resample))
+acc_ms
+```
+
+Um valor 0 indica paridade entre os grupos e o nosso resultado indica que há probabilidades equalizadas.
+
+```{r}
+hpc %>%
+  acc_ms(truth = obs, estimate = pred)
+```
 :::
 
 # Exemplos
