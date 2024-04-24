@@ -194,6 +194,23 @@ As métricas de grupo formam o *back-end* das métricas de fairness em modelos o
 
 # demographic_parity()
 
+A função **demographic_parity** tem o objetivo que avaliar a paridade demográfica e essa é sastifeita quando as previsões de um modelo têm a mesma taxa positiva prevista entre os grupos. 
+
+Seu único parâmetro é:
+
+- by: O identificador de coluna do recurso confidencial. Este deve ser um nome de coluna sem aspas, referindo-se a uma coluna nos dados não pré-processados.
+
+Vamos entender um pouco mais?
+
+Esta função gera uma função métrica de **critério de justiça**. Dada uma variável de agrupamento **by**, a função **demographic_parity()** retornará uma função métrica de critério, como vimos anteriormente, que está associada ao agrupamento de variáveis de dados  do parâmetro **by** e a um pós-processador. 
+
+A função gerada primeiro gerará um conjunto de valores de métrica de  **detection_prevalence** por grupo antes de resumir entre os grupos usando a função de pós-processamento.
+
+**A função gerada possui apenas um método de quadro de dados e deve ser usada como parte de um conjunto de métricas.**
+
+
+
+
 # equal_opportunity()
 
 # equalized_odds()
