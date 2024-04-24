@@ -237,7 +237,7 @@ O que o resultado **.estimate** está nos contando?
 | demographic_parity | macro          | 2.775558e-17  | Resample |
 
 
-Um valor 0 (ou próximo de 0) indica paridade entre os grupos. Observe que esta definição não depende do verdadeiro resultado. O **truth** argumento é incluído nas métricas geradas para fins de consistência.
+Um valor 0 (ou próximo de 0) indica paridade entre os grupos. Observe que esta definição não depende do verdadeiro resultado. O parâmetro **truth** é incluído nas métricas geradas para fins de consistência.
 
 # equal_opportunity()
 
