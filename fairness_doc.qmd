@@ -125,11 +125,13 @@ Vamos entender os parâmetros dessa função?
     -   sens
     -   spec
 
+e você consegue ter mais informações sobre as métricas no [CRAN do pacote](https://cran.r-project.org/web/packages/yardstick/index.html).
+
 -   name: O nome da métrica a ser colocada na coluna .metric da saída.
 
 -   aggregate: Uma função para resumir os resultados do conjunto de métricas gerado. A função pega os resultados do conjunto de métricas como o primeiro argumento e retorna um único valor numérico fornecendo o valor **.estimate** como saída.
 
-O parâmetro fn Veja o exemplo abaixo:
+No exemplo abaixo estamos utilizando a métrica **accuracy**:
 
 ```{r}
 accuracy_diff <- yardstick::new_groupwise_metric(
@@ -140,3 +142,64 @@ accuracy_diff <- yardstick::new_groupwise_metric(
                                }
 )
 ```
+
+Veja que a saída **accuracy_diff** é um objeto da classe **metric_factory**.
+
+```{r}
+class(accuracy_diff)
+```
+A partir de agora a função **accuracy_diff** sabe como obter valores de acurácia para cada grupo e depois retornar a diferença entre a acurácia do primeira e do segundo resultado como saída.
+
+A última coisa que precisamos associar ao objeto é o nome da variável de agrupamento para a qual passar **group_by()**. Podemos passar o nome da variável para **accuracy_diff** fazer isso:
+
+```{r}
+accuracy_diff_by_batch <- accuracy_diff(batch)
+accuracy_diff_by_batch
+```
+Logo, podemos usar a a**ccuracy_diff_by_batch()** como métrica da mesma forma que usaríamos **accuracy()**. Veja o exemplo abaixo:
+
+```{r}
+hpc %>% 
+  dplyr::filter(Resample == "Fold01") %>%
+  accuracy_diff_by_batch(obs, pred)
+```
+Também podemos adicionar **accuracy_diff_by_batch()** aos conjuntos de métricas:
+
+```{r}
+acc_ms <- yardstick::metric_set(accuracy, accuracy_diff_by_batch)
+acc_ms
+```
+
+Aplicando as métricas no **Fold01** da base de dados:
+
+```{r}
+hpc %>% 
+  filter(Resample == "Fold01") %>%
+  acc_ms(truth = obs, estimate = pred)
+```
+
+Veja que a saída **.by** nos informa que o agrupamento foi feito através do **batch**, o que nos traz como inferência que as métricas de grupo reconhecem o grupo. Quando essa operação é aplicada a dados com quaisquer variáveis com agrupamentos diferentes da coluna passada como o primeiro argumento para **accuracy_diff()**, neste caso, **accuracy_diff_by_batch()**, as métricas se comportarão como qualquer outra métrica de critério. Por exemplo:
+
+```{r}
+hpc %>% 
+  group_by(Resample) %>%
+  accuracy_diff_by_batch(obs, pred)
+```
+
+As métricas de grupo formam o *back-end* das métricas de fairness em modelos organizados e, a partir dos conhecimentos adquidos até o momento, vamos estudá-los.
+
+# Métricas Fairness
+
+::: panel-tabset
+
+# demographic_parity()
+
+# equal_opportunity()
+
+# equalized_odds()
+
+
+
+
+
+:::

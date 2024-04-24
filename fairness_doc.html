@@ -8,7 +8,7 @@
 
 <meta name="author" content="Fernanda Kelly R. Silva | www.fernandakellyrs.com">
 
-<title>Fainesse</title>
+<title>Fairness</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -3085,6 +3085,7 @@ vertical-align: -.125em;
   <li><a href="#conscientização-de-grupo" id="toc-conscientização-de-grupo" class="nav-link" data-scroll-target="#conscientização-de-grupo">Conscientização de grupo</a></li>
   </ul></li>
   <li><a href="#métricas-de-grupo" id="toc-métricas-de-grupo" class="nav-link" data-scroll-target="#métricas-de-grupo">Métricas de grupo</a></li>
+  <li><a href="#métricas-fairness" id="toc-métricas-fairness" class="nav-link" data-scroll-target="#métricas-fairness">Métricas Fairness</a></li>
   </ul>
 </nav>
 </div>
@@ -3092,7 +3093,7 @@ vertical-align: -.125em;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">Fainesse</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Código</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">Fairness</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Código</button></div></div>
 <p class="subtitle lead"><strong>Fairness com Tidymodels</strong></p>
 </div>
 
@@ -3239,10 +3240,13 @@ vertical-align: -.125em;
 <li>sens</li>
 <li>spec</li>
 </ul></li>
+</ul>
+<p>e você consegue ter mais informações sobre as métricas no <a href="https://cran.r-project.org/web/packages/yardstick/index.html">CRAN do pacote</a>.</p>
+<ul>
 <li><p>name: O nome da métrica a ser colocada na coluna .metric da saída.</p></li>
 <li><p>aggregate: Uma função para resumir os resultados do conjunto de métricas gerado. A função pega os resultados do conjunto de métricas como o primeiro argumento e retorna um único valor numérico fornecendo o valor <strong>.estimate</strong> como saída.</p></li>
 </ul>
-<p>O parâmetro fn Veja o exemplo abaixo:</p>
+<p>No exemplo abaixo estamos utilizando a métrica <strong>accuracy</strong>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>accuracy_diff <span class="ot">&lt;-</span> yardstick<span class="sc">::</span><span class="fu">new_groupwise_metric</span>(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fn =</span> accuracy,</span>
@@ -3251,6 +3255,97 @@ vertical-align: -.125em;
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                               base<span class="sc">::</span><span class="fu">diff</span>(<span class="fu">c</span>(acc_by_group<span class="sc">$</span>.estimate[<span class="dv">2</span>], acc_by_group<span class="sc">$</span>.estimate[<span class="dv">1</span>]))  </span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                               }</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Veja que a saída <strong>accuracy_diff</strong> é um objeto da classe <strong>metric_factory</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(accuracy_diff)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] &quot;metric_factory&quot; &quot;function&quot;      </code></pre>
+</div>
+</div>
+<p>A partir de agora a função <strong>accuracy_diff</strong> sabe como obter valores de acurácia para cada grupo e depois retornar a diferença entre a acurácia do primeira e do segundo resultado como saída.</p>
+<p>A última coisa que precisamos associar ao objeto é o nome da variável de agrupamento para a qual passar <strong>group_by()</strong>. Podemos passar o nome da variável para <strong>accuracy_diff</strong> fazer isso:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>accuracy_diff_by_batch <span class="ot">&lt;-</span> <span class="fu">accuracy_diff</span>(batch)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>accuracy_diff_by_batch</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>A class metric | direction: minimize, group-wise on: batch</code></pre>
+</div>
+</div>
+<p>Logo, podemos usar a a<strong>ccuracy_diff_by_batch()</strong> como métrica da mesma forma que usaríamos <strong>accuracy()</strong>. Veja o exemplo abaixo:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>hpc <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Resample <span class="sc">==</span> <span class="st">&quot;Fold01&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy_diff_by_batch</span>(obs, pred)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  .metric       .by   .estimator .estimate
+  &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy_diff batch multiclass   -0.0252</code></pre>
+</div>
+</div>
+<p>Também podemos adicionar <strong>accuracy_diff_by_batch()</strong> aos conjuntos de métricas:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>acc_ms <span class="ot">&lt;-</span> yardstick<span class="sc">::</span><span class="fu">metric_set</span>(accuracy, accuracy_diff_by_batch)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>acc_ms</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>A metric set, consisting of:
+- `accuracy()`, a class metric               | direction: maximize
+- `accuracy_diff_by_batch()`, a class metric | direction: minimize, group-wise
+on: batch</code></pre>
+</div>
+</div>
+<p>Aplicando as métricas no <strong>Fold01</strong> da base de dados:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>hpc <span class="sc">%&gt;%</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Resample <span class="sc">==</span> <span class="st">&quot;Fold01&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">acc_ms</span>(<span class="at">truth =</span> obs, <span class="at">estimate =</span> pred)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  .metric       .estimator .estimate .by  
+  &lt;chr&gt;         &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;
+1 accuracy      multiclass    0.726  &lt;NA&gt; 
+2 accuracy_diff multiclass   -0.0252 batch</code></pre>
+</div>
+</div>
+<p>Veja que a saída <strong>.by</strong> nos informa que o agrupamento foi feito através do <strong>batch</strong>, o que nos traz como inferência que as métricas de grupo reconhecem o grupo. Quando essa operação é aplicada a dados com quaisquer variáveis com agrupamentos diferentes da coluna passada como o primeiro argumento para <strong>accuracy_diff()</strong>, neste caso, <strong>accuracy_diff_by_batch()</strong>, as métricas se comportarão como qualquer outra métrica de critério. Por exemplo:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>hpc <span class="sc">%&gt;%</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Resample) <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy_diff_by_batch</span>(obs, pred)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 5
+   Resample .metric       .by   .estimator .estimate
+   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;          &lt;dbl&gt;
+ 1 Fold01   accuracy_diff batch multiclass -0.0252  
+ 2 Fold02   accuracy_diff batch multiclass  0.106   
+ 3 Fold03   accuracy_diff batch multiclass  0.0220  
+ 4 Fold04   accuracy_diff batch multiclass -0.000300
+ 5 Fold05   accuracy_diff batch multiclass -0.0361  
+ 6 Fold06   accuracy_diff batch multiclass  0.0153  
+ 7 Fold07   accuracy_diff batch multiclass -0.0323  
+ 8 Fold08   accuracy_diff batch multiclass -0.0159  
+ 9 Fold09   accuracy_diff batch multiclass -0.0131  
+10 Fold10   accuracy_diff batch multiclass -0.0255  </code></pre>
+</div>
+</div>
+<p>As métricas de grupo formam o <em>back-end</em> das métricas de fairness em modelos organizados e, a partir dos conhecimentos adquidos até o momento, vamos estudá-los.</p>
+</section>
+<section id="métricas-fairness" class="level1">
+<h1>Métricas Fairness</h1>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href>demographic_parity()</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href>equal_opportunity()</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href>equalized_odds()</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+
+</div>
+</div>
 </div>
 <!-- -->
 
@@ -3912,148 +4007,211 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Código fonte</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
-<div class="sourceCode" id="cb12" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Fainesse&quot; # Título do relatório</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> &quot;**Fairness com Tidymodels**&quot;</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> &quot;Fernanda Kelly R. Silva | www.fernandakellyrs.com&quot;</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> pt </span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> &quot;`r format(Sys.Date())`&quot; </span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="an">date-format:</span><span class="co"> short </span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> true </span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">    html: </span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">      embed-resources: true</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">      #css: [&quot;custom.css&quot;] </span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">      code-fold: false </span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co">      code-tools: true  </span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">      theme: </span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co">        light: cosmo</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co">        dark: superhero </span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co">#title-block-banner: &quot;#874a9c&quot; </span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="an">code-annotations:</span><span class="co"> hover </span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co">  warning: false</span></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="co">  message: false</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co">  echo: true</span></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="fu"># Universo Tidymodels</span></span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>Os pacotes principais do **tidymodels** trabalham juntos para permitir uma ampla variedade de abordagens de modelagem e eles são:</span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**rsample** que fornece infraestrutura para divisão e reamostragem eficiente de dados;</span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**parnsip** é uma interface organizada e unificada para modelos que pode ser usada para testar uma variedade de modelos sem se prender às minúcias sintáticas dos pacotes subjacentes;</span>
-<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**recipes** é uma interface organizada para ferramentas de pré-processamento de dados para engenharia de recursos;</span>
-<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**workflows** (fluxos de trabalho) agrupam pré-processamento, modelagem e pós-processamento;</span>
-<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**tune** ajuda a otimizar os hiperparâmetros do seu modelo e as etapas de pré-processamento;</span>
-<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**yardstick** (critério) mede a eficácia dos modelos usando métricas de desempenho;</span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**broom** converte as informações em objetos R estatísticos comuns em formatos previsíveis e fáceis de usar;</span>
-<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**dials** cria e gerencia parâmetros de ajuste e grades de parâmetros.</span>
-<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>A estrutura tidymodels também inclui muitos outros pacotes projetados para análise de dados especializada e tarefas de modelagem. Eles não são carregados automaticamente com library(tidymodels), então você precisará carregar cada um com sua própria chamada para library().</span>
-<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a><span class="fu"># Pacote: yardstick</span></span>
-<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>A versão 1.3.0 do Yardstick introduziu uma implementação para **métricas de grupo**. O caso de uso que motiva a implementação desta funcionalidade são as métricas de justiça, embora as métricas de grupo tenham aplicações além desse domínio. As métricas de justiça quantificam o grau de disparidade em um valor de métrica entre grupos.</span>
-<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>A título de exemplo vamos utilizar o conjunto de dados **hpc_cv**, contendo probabilidades de classe e previsões de classe para uma análise discriminante linear ajustada ao conjunto de dados HPC de Kuhn e Johnson (2013).</span>
-<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(yardstick)</span>
-<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## Dados</span></span>
-<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>Esses dados são os conjuntos de avaliação de um esquema de validação cruzada de 10 vezes. Este quadro de dados possui as variáveis de **classe verdadeira** (obs), a **previsão da classe** (pred) e as **colunas para cada probabilidade de classe** (colunas VF, F, M e L). Além disso, é incluída uma coluna para o **indicador de reamostragem** (resample).</span>
-<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>dados_exemplo1 <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(yardstick<span class="sc">::</span>hpc_cv)</span>
-<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dados_exemplo1, <span class="dv">5</span>)</span>
-<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>Para os propósitos do exemplo, também adicionaremos uma coluna denominada por **batch** aos dados e selecionaremos as colunas para as probabilidades de classe, das quais não precisamos.</span>
-<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>hpc <span class="ot">&lt;-</span> dados_exemplo1 <span class="sc">%&gt;%</span> </span>
-<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a>       dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">batch =</span> base<span class="sc">::</span><span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>), <span class="fu">nrow</span>(.), <span class="at">replace =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a>       <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(VF, F, M, L))</span>
-<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conscientização de grupo</span></span>
-<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a>Mesmo antes da implementação das métricas de grupo, todas as métricas de referência já tinham consciência do grupo. Quando dados agrupados são passados para uma métrica com reconhecimento de grupo, eles retornarão valores de métrica calculados para cada grupo. Logo, se temos 10 folds, e se quiséssemos calcular a precisão do modelo reamostrado, poderíamos escrever:</span>
-<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a>hpc <span class="sc">%&gt;%</span> </span>
-<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(Resample) <span class="sc">%&gt;%</span></span>
-<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a>  yardstick<span class="sc">::</span><span class="fu">accuracy</span>(obs, pred)</span>
-<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a>Veja que aqui nós temos como produto a estimação da acurácia de cada fold ou grupo de interesse. Esse comportamento é o que entendemos por consciência de grupo.</span>
-<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a><span class="fu"># Métricas de grupo</span></span>
-<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>As métricas de grupo são associadas a uma coluna de dados de modo que, quando os dados são transmitidos a essa coluna, a métrica agrupará temporariamente por essa coluna, calculará valores para cada um dos grupos definidos pela coluna e, em seguida, agregará os valores calculados para o agrupamento temporário de volta ao nível de agrupamento dos dados de entrada.</span>
-<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a>Suponha que os **batch** nos dados representem dois grupos para os quais o desempenho do modelo não deva diferir. Para quantificar o grau em que o desempenho do modelo difere para esses dois grupos, poderíamos calcular os valores de precisão para cada grupo separadamente e, em seguida, calcular a diferença. Veja o exemplo abaixo.</span>
-<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-106"><a href="#cb12-106" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-107"><a href="#cb12-107" aria-hidden="true" tabindex="-1"></a>acc_by_group <span class="ot">&lt;-</span> hpc <span class="sc">%&gt;%</span> </span>
-<span id="cb12-108"><a href="#cb12-108" aria-hidden="true" tabindex="-1"></a>                dplyr<span class="sc">::</span><span class="fu">filter</span>(Resample <span class="sc">==</span> <span class="st">&quot;Fold01&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a>                dplyr<span class="sc">::</span><span class="fu">group_by</span>(batch) <span class="sc">%&gt;%</span></span>
-<span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a>                yardstick<span class="sc">::</span><span class="fu">accuracy</span>(obs, pred)</span>
-<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a>acc_by_group</span>
-<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-114"><a href="#cb12-114" aria-hidden="true" tabindex="-1"></a>Vamos observar a diferença entre os **batch**:</span>
-<span id="cb12-115"><a href="#cb12-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-118"><a href="#cb12-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-119"><a href="#cb12-119" aria-hidden="true" tabindex="-1"></a>base<span class="sc">::</span><span class="fu">diff</span>(<span class="fu">c</span>(acc_by_group<span class="sc">$</span>.estimate[<span class="dv">2</span>], acc_by_group<span class="sc">$</span>.estimate[<span class="dv">1</span>]))</span>
-<span id="cb12-120"><a href="#cb12-120" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb12-121"><a href="#cb12-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-122"><a href="#cb12-122" aria-hidden="true" tabindex="-1"></a>As métricas de grupo codificam a função **group_by()**, etapa de agregação amostrada acima em uma métrica de critério. Podemos definir uma nova métrica groupwise com a função **new_groupwise_metric()** do pacote new_groupwise_metric.</span>
-<span id="cb12-123"><a href="#cb12-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-124"><a href="#cb12-124" aria-hidden="true" tabindex="-1"></a>Vamos entender os parâmetros dessa função?</span>
-<span id="cb12-125"><a href="#cb12-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-126"><a href="#cb12-126" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>fn: Uma função métrica de critério ou conjunto de métricas. As métricas disponíveis no pacote são diversas, mas algumas delas são:</span>
-<span id="cb12-127"><a href="#cb12-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-128"><a href="#cb12-128" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>detection_prevalence</span>
-<span id="cb12-129"><a href="#cb12-129" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>accuracy</span>
-<span id="cb12-130"><a href="#cb12-130" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>average_precision</span>
-<span id="cb12-131"><a href="#cb12-131" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>classification_cost</span>
-<span id="cb12-132"><a href="#cb12-132" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>poisson_log_loss</span>
-<span id="cb12-133"><a href="#cb12-133" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>precision</span>
-<span id="cb12-134"><a href="#cb12-134" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>roc_auc</span>
-<span id="cb12-135"><a href="#cb12-135" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>recall</span>
-<span id="cb12-136"><a href="#cb12-136" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>rmse</span>
-<span id="cb12-137"><a href="#cb12-137" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>sens</span>
-<span id="cb12-138"><a href="#cb12-138" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>spec</span>
-<span id="cb12-139"><a href="#cb12-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-140"><a href="#cb12-140" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>name: O nome da métrica a ser colocada na coluna .metric da saída.</span>
-<span id="cb12-141"><a href="#cb12-141" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-142"><a href="#cb12-142" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>aggregate: Uma função para resumir os resultados do conjunto de métricas gerado. A função pega os resultados do conjunto de métricas como o primeiro argumento e retorna um único valor numérico fornecendo o valor **.estimate** como saída.</span>
-<span id="cb12-143"><a href="#cb12-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-144"><a href="#cb12-144" aria-hidden="true" tabindex="-1"></a>O parâmetro fn Veja o exemplo abaixo:</span>
-<span id="cb12-145"><a href="#cb12-145" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-148"><a href="#cb12-148" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-149"><a href="#cb12-149" aria-hidden="true" tabindex="-1"></a>accuracy_diff <span class="ot">&lt;-</span> yardstick<span class="sc">::</span><span class="fu">new_groupwise_metric</span>(</span>
-<span id="cb12-150"><a href="#cb12-150" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fn =</span> accuracy,</span>
-<span id="cb12-151"><a href="#cb12-151" aria-hidden="true" tabindex="-1"></a>                               <span class="at">name =</span> <span class="st">&quot;accuracy_diff&quot;</span>,</span>
-<span id="cb12-152"><a href="#cb12-152" aria-hidden="true" tabindex="-1"></a>                               <span class="at">aggregate =</span> <span class="cf">function</span>(acc_by_group){</span>
-<span id="cb12-153"><a href="#cb12-153" aria-hidden="true" tabindex="-1"></a>                               base<span class="sc">::</span><span class="fu">diff</span>(<span class="fu">c</span>(acc_by_group<span class="sc">$</span>.estimate[<span class="dv">2</span>], acc_by_group<span class="sc">$</span>.estimate[<span class="dv">1</span>]))  </span>
-<span id="cb12-154"><a href="#cb12-154" aria-hidden="true" tabindex="-1"></a>                               }</span>
-<span id="cb12-155"><a href="#cb12-155" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-156"><a href="#cb12-156" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="sourceCode" id="cb24" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Fairness&quot; # Título do relatório</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> &quot;**Fairness com Tidymodels**&quot;</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> &quot;Fernanda Kelly R. Silva | www.fernandakellyrs.com&quot;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> pt </span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> &quot;`r format(Sys.Date())`&quot; </span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="an">date-format:</span><span class="co"> short </span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> true </span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co">    html: </span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co">      embed-resources: true</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="co">      #css: [&quot;custom.css&quot;] </span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co">      code-fold: false </span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co">      code-tools: true  </span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="co">      theme: </span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="co">        light: cosmo</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="co">        dark: superhero </span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="co">#title-block-banner: &quot;#874a9c&quot; </span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="an">code-annotations:</span><span class="co"> hover </span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="co">  warning: false</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="co">  message: false</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a><span class="co">  echo: true</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a><span class="fu"># Universo Tidymodels</span></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>Os pacotes principais do **tidymodels** trabalham juntos para permitir uma ampla variedade de abordagens de modelagem e eles são:</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**rsample** que fornece infraestrutura para divisão e reamostragem eficiente de dados;</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**parnsip** é uma interface organizada e unificada para modelos que pode ser usada para testar uma variedade de modelos sem se prender às minúcias sintáticas dos pacotes subjacentes;</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**recipes** é uma interface organizada para ferramentas de pré-processamento de dados para engenharia de recursos;</span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**workflows** (fluxos de trabalho) agrupam pré-processamento, modelagem e pós-processamento;</span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**tune** ajuda a otimizar os hiperparâmetros do seu modelo e as etapas de pré-processamento;</span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**yardstick** (critério) mede a eficácia dos modelos usando métricas de desempenho;</span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**broom** converte as informações em objetos R estatísticos comuns em formatos previsíveis e fáceis de usar;</span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**dials** cria e gerencia parâmetros de ajuste e grades de parâmetros.</span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>A estrutura tidymodels também inclui muitos outros pacotes projetados para análise de dados especializada e tarefas de modelagem. Eles não são carregados automaticamente com library(tidymodels), então você precisará carregar cada um com sua própria chamada para library().</span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a><span class="fu"># Pacote: yardstick</span></span>
+<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a>A versão 1.3.0 do Yardstick introduziu uma implementação para **métricas de grupo**. O caso de uso que motiva a implementação desta funcionalidade são as métricas de justiça, embora as métricas de grupo tenham aplicações além desse domínio. As métricas de justiça quantificam o grau de disparidade em um valor de métrica entre grupos.</span>
+<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a>A título de exemplo vamos utilizar o conjunto de dados **hpc_cv**, contendo probabilidades de classe e previsões de classe para uma análise discriminante linear ajustada ao conjunto de dados HPC de Kuhn e Johnson (2013).</span>
+<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(yardstick)</span>
+<span id="cb24-58"><a href="#cb24-58" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb24-59"><a href="#cb24-59" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-60"><a href="#cb24-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-61"><a href="#cb24-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## Dados</span></span>
+<span id="cb24-62"><a href="#cb24-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-63"><a href="#cb24-63" aria-hidden="true" tabindex="-1"></a>Esses dados são os conjuntos de avaliação de um esquema de validação cruzada de 10 vezes. Este quadro de dados possui as variáveis de **classe verdadeira** (obs), a **previsão da classe** (pred) e as **colunas para cada probabilidade de classe** (colunas VF, F, M e L). Além disso, é incluída uma coluna para o **indicador de reamostragem** (resample).</span>
+<span id="cb24-64"><a href="#cb24-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-67"><a href="#cb24-67" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-68"><a href="#cb24-68" aria-hidden="true" tabindex="-1"></a>dados_exemplo1 <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(yardstick<span class="sc">::</span>hpc_cv)</span>
+<span id="cb24-69"><a href="#cb24-69" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dados_exemplo1, <span class="dv">5</span>)</span>
+<span id="cb24-70"><a href="#cb24-70" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-71"><a href="#cb24-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-72"><a href="#cb24-72" aria-hidden="true" tabindex="-1"></a>Para os propósitos do exemplo, também adicionaremos uma coluna denominada por **batch** aos dados e selecionaremos as colunas para as probabilidades de classe, das quais não precisamos.</span>
+<span id="cb24-73"><a href="#cb24-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-76"><a href="#cb24-76" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-77"><a href="#cb24-77" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb24-78"><a href="#cb24-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-79"><a href="#cb24-79" aria-hidden="true" tabindex="-1"></a>hpc <span class="ot">&lt;-</span> dados_exemplo1 <span class="sc">%&gt;%</span> </span>
+<span id="cb24-80"><a href="#cb24-80" aria-hidden="true" tabindex="-1"></a>       dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">batch =</span> base<span class="sc">::</span><span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>), <span class="fu">nrow</span>(.), <span class="at">replace =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-81"><a href="#cb24-81" aria-hidden="true" tabindex="-1"></a>       <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(VF, F, M, L))</span>
+<span id="cb24-82"><a href="#cb24-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-83"><a href="#cb24-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-84"><a href="#cb24-84" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conscientização de grupo</span></span>
+<span id="cb24-85"><a href="#cb24-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-86"><a href="#cb24-86" aria-hidden="true" tabindex="-1"></a>Mesmo antes da implementação das métricas de grupo, todas as métricas de referência já tinham consciência do grupo. Quando dados agrupados são passados para uma métrica com reconhecimento de grupo, eles retornarão valores de métrica calculados para cada grupo. Logo, se temos 10 folds, e se quiséssemos calcular a precisão do modelo reamostrado, poderíamos escrever:</span>
+<span id="cb24-87"><a href="#cb24-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-90"><a href="#cb24-90" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-91"><a href="#cb24-91" aria-hidden="true" tabindex="-1"></a>hpc <span class="sc">%&gt;%</span> </span>
+<span id="cb24-92"><a href="#cb24-92" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(Resample) <span class="sc">%&gt;%</span></span>
+<span id="cb24-93"><a href="#cb24-93" aria-hidden="true" tabindex="-1"></a>  yardstick<span class="sc">::</span><span class="fu">accuracy</span>(obs, pred)</span>
+<span id="cb24-94"><a href="#cb24-94" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-95"><a href="#cb24-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-96"><a href="#cb24-96" aria-hidden="true" tabindex="-1"></a>Veja que aqui nós temos como produto a estimação da acurácia de cada fold ou grupo de interesse. Esse comportamento é o que entendemos por consciência de grupo.</span>
+<span id="cb24-97"><a href="#cb24-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-98"><a href="#cb24-98" aria-hidden="true" tabindex="-1"></a><span class="fu"># Métricas de grupo</span></span>
+<span id="cb24-99"><a href="#cb24-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-100"><a href="#cb24-100" aria-hidden="true" tabindex="-1"></a>As métricas de grupo são associadas a uma coluna de dados de modo que, quando os dados são transmitidos a essa coluna, a métrica agrupará temporariamente por essa coluna, calculará valores para cada um dos grupos definidos pela coluna e, em seguida, agregará os valores calculados para o agrupamento temporário de volta ao nível de agrupamento dos dados de entrada.</span>
+<span id="cb24-101"><a href="#cb24-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-102"><a href="#cb24-102" aria-hidden="true" tabindex="-1"></a>Suponha que os **batch** nos dados representem dois grupos para os quais o desempenho do modelo não deva diferir. Para quantificar o grau em que o desempenho do modelo difere para esses dois grupos, poderíamos calcular os valores de precisão para cada grupo separadamente e, em seguida, calcular a diferença. Veja o exemplo abaixo.</span>
+<span id="cb24-103"><a href="#cb24-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-106"><a href="#cb24-106" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-107"><a href="#cb24-107" aria-hidden="true" tabindex="-1"></a>acc_by_group <span class="ot">&lt;-</span> hpc <span class="sc">%&gt;%</span> </span>
+<span id="cb24-108"><a href="#cb24-108" aria-hidden="true" tabindex="-1"></a>                dplyr<span class="sc">::</span><span class="fu">filter</span>(Resample <span class="sc">==</span> <span class="st">&quot;Fold01&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb24-109"><a href="#cb24-109" aria-hidden="true" tabindex="-1"></a>                dplyr<span class="sc">::</span><span class="fu">group_by</span>(batch) <span class="sc">%&gt;%</span></span>
+<span id="cb24-110"><a href="#cb24-110" aria-hidden="true" tabindex="-1"></a>                yardstick<span class="sc">::</span><span class="fu">accuracy</span>(obs, pred)</span>
+<span id="cb24-111"><a href="#cb24-111" aria-hidden="true" tabindex="-1"></a>acc_by_group</span>
+<span id="cb24-112"><a href="#cb24-112" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-113"><a href="#cb24-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-114"><a href="#cb24-114" aria-hidden="true" tabindex="-1"></a>Vamos observar a diferença entre os **batch**:</span>
+<span id="cb24-115"><a href="#cb24-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-118"><a href="#cb24-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-119"><a href="#cb24-119" aria-hidden="true" tabindex="-1"></a>base<span class="sc">::</span><span class="fu">diff</span>(<span class="fu">c</span>(acc_by_group<span class="sc">$</span>.estimate[<span class="dv">2</span>], acc_by_group<span class="sc">$</span>.estimate[<span class="dv">1</span>]))</span>
+<span id="cb24-120"><a href="#cb24-120" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-121"><a href="#cb24-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-122"><a href="#cb24-122" aria-hidden="true" tabindex="-1"></a>As métricas de grupo codificam a função **group_by()**, etapa de agregação amostrada acima em uma métrica de critério. Podemos definir uma nova métrica groupwise com a função **new_groupwise_metric()** do pacote new_groupwise_metric.</span>
+<span id="cb24-123"><a href="#cb24-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-124"><a href="#cb24-124" aria-hidden="true" tabindex="-1"></a>Vamos entender os parâmetros dessa função?</span>
+<span id="cb24-125"><a href="#cb24-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-126"><a href="#cb24-126" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>fn: Uma função métrica de critério ou conjunto de métricas. As métricas disponíveis no pacote são diversas, mas algumas delas são:</span>
+<span id="cb24-127"><a href="#cb24-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-128"><a href="#cb24-128" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>detection_prevalence</span>
+<span id="cb24-129"><a href="#cb24-129" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>accuracy</span>
+<span id="cb24-130"><a href="#cb24-130" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>average_precision</span>
+<span id="cb24-131"><a href="#cb24-131" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>classification_cost</span>
+<span id="cb24-132"><a href="#cb24-132" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>poisson_log_loss</span>
+<span id="cb24-133"><a href="#cb24-133" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>precision</span>
+<span id="cb24-134"><a href="#cb24-134" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>roc_auc</span>
+<span id="cb24-135"><a href="#cb24-135" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>recall</span>
+<span id="cb24-136"><a href="#cb24-136" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>rmse</span>
+<span id="cb24-137"><a href="#cb24-137" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>sens</span>
+<span id="cb24-138"><a href="#cb24-138" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>spec</span>
+<span id="cb24-139"><a href="#cb24-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-140"><a href="#cb24-140" aria-hidden="true" tabindex="-1"></a>e você consegue ter mais informações sobre as métricas no <span class="co">[</span><span class="ot">CRAN do pacote</span><span class="co">](https://cran.r-project.org/web/packages/yardstick/index.html)</span>.</span>
+<span id="cb24-141"><a href="#cb24-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-142"><a href="#cb24-142" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>name: O nome da métrica a ser colocada na coluna .metric da saída.</span>
+<span id="cb24-143"><a href="#cb24-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-144"><a href="#cb24-144" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>aggregate: Uma função para resumir os resultados do conjunto de métricas gerado. A função pega os resultados do conjunto de métricas como o primeiro argumento e retorna um único valor numérico fornecendo o valor **.estimate** como saída.</span>
+<span id="cb24-145"><a href="#cb24-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-146"><a href="#cb24-146" aria-hidden="true" tabindex="-1"></a>No exemplo abaixo estamos utilizando a métrica **accuracy**:</span>
+<span id="cb24-147"><a href="#cb24-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-150"><a href="#cb24-150" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-151"><a href="#cb24-151" aria-hidden="true" tabindex="-1"></a>accuracy_diff <span class="ot">&lt;-</span> yardstick<span class="sc">::</span><span class="fu">new_groupwise_metric</span>(</span>
+<span id="cb24-152"><a href="#cb24-152" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fn =</span> accuracy,</span>
+<span id="cb24-153"><a href="#cb24-153" aria-hidden="true" tabindex="-1"></a>                               <span class="at">name =</span> <span class="st">&quot;accuracy_diff&quot;</span>,</span>
+<span id="cb24-154"><a href="#cb24-154" aria-hidden="true" tabindex="-1"></a>                               <span class="at">aggregate =</span> <span class="cf">function</span>(acc_by_group){</span>
+<span id="cb24-155"><a href="#cb24-155" aria-hidden="true" tabindex="-1"></a>                               base<span class="sc">::</span><span class="fu">diff</span>(<span class="fu">c</span>(acc_by_group<span class="sc">$</span>.estimate[<span class="dv">2</span>], acc_by_group<span class="sc">$</span>.estimate[<span class="dv">1</span>]))  </span>
+<span id="cb24-156"><a href="#cb24-156" aria-hidden="true" tabindex="-1"></a>                               }</span>
+<span id="cb24-157"><a href="#cb24-157" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-158"><a href="#cb24-158" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-159"><a href="#cb24-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-160"><a href="#cb24-160" aria-hidden="true" tabindex="-1"></a>Veja que a saída **accuracy_diff** é um objeto da classe **metric_factory**.</span>
+<span id="cb24-161"><a href="#cb24-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-164"><a href="#cb24-164" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-165"><a href="#cb24-165" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(accuracy_diff)</span>
+<span id="cb24-166"><a href="#cb24-166" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-167"><a href="#cb24-167" aria-hidden="true" tabindex="-1"></a>A partir de agora a função **accuracy_diff** sabe como obter valores de acurácia para cada grupo e depois retornar a diferença entre a acurácia do primeira e do segundo resultado como saída.</span>
+<span id="cb24-168"><a href="#cb24-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-169"><a href="#cb24-169" aria-hidden="true" tabindex="-1"></a>A última coisa que precisamos associar ao objeto é o nome da variável de agrupamento para a qual passar **group_by()**. Podemos passar o nome da variável para **accuracy_diff** fazer isso:</span>
+<span id="cb24-170"><a href="#cb24-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-173"><a href="#cb24-173" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-174"><a href="#cb24-174" aria-hidden="true" tabindex="-1"></a>accuracy_diff_by_batch <span class="ot">&lt;-</span> <span class="fu">accuracy_diff</span>(batch)</span>
+<span id="cb24-175"><a href="#cb24-175" aria-hidden="true" tabindex="-1"></a>accuracy_diff_by_batch</span>
+<span id="cb24-176"><a href="#cb24-176" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-177"><a href="#cb24-177" aria-hidden="true" tabindex="-1"></a>Logo, podemos usar a a**ccuracy_diff_by_batch()** como métrica da mesma forma que usaríamos **accuracy()**. Veja o exemplo abaixo:</span>
+<span id="cb24-178"><a href="#cb24-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-181"><a href="#cb24-181" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-182"><a href="#cb24-182" aria-hidden="true" tabindex="-1"></a>hpc <span class="sc">%&gt;%</span> </span>
+<span id="cb24-183"><a href="#cb24-183" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Resample <span class="sc">==</span> <span class="st">&quot;Fold01&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb24-184"><a href="#cb24-184" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy_diff_by_batch</span>(obs, pred)</span>
+<span id="cb24-185"><a href="#cb24-185" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-186"><a href="#cb24-186" aria-hidden="true" tabindex="-1"></a>Também podemos adicionar **accuracy_diff_by_batch()** aos conjuntos de métricas:</span>
+<span id="cb24-187"><a href="#cb24-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-190"><a href="#cb24-190" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-191"><a href="#cb24-191" aria-hidden="true" tabindex="-1"></a>acc_ms <span class="ot">&lt;-</span> yardstick<span class="sc">::</span><span class="fu">metric_set</span>(accuracy, accuracy_diff_by_batch)</span>
+<span id="cb24-192"><a href="#cb24-192" aria-hidden="true" tabindex="-1"></a>acc_ms</span>
+<span id="cb24-193"><a href="#cb24-193" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-194"><a href="#cb24-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-195"><a href="#cb24-195" aria-hidden="true" tabindex="-1"></a>Aplicando as métricas no **Fold01** da base de dados:</span>
+<span id="cb24-196"><a href="#cb24-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-199"><a href="#cb24-199" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-200"><a href="#cb24-200" aria-hidden="true" tabindex="-1"></a>hpc <span class="sc">%&gt;%</span> </span>
+<span id="cb24-201"><a href="#cb24-201" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Resample <span class="sc">==</span> <span class="st">&quot;Fold01&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb24-202"><a href="#cb24-202" aria-hidden="true" tabindex="-1"></a>  <span class="fu">acc_ms</span>(<span class="at">truth =</span> obs, <span class="at">estimate =</span> pred)</span>
+<span id="cb24-203"><a href="#cb24-203" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-204"><a href="#cb24-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-205"><a href="#cb24-205" aria-hidden="true" tabindex="-1"></a>Veja que a saída **.by** nos informa que o agrupamento foi feito através do **batch**, o que nos traz como inferência que as métricas de grupo reconhecem o grupo. Quando essa operação é aplicada a dados com quaisquer variáveis com agrupamentos diferentes da coluna passada como o primeiro argumento para **accuracy_diff()**, neste caso, **accuracy_diff_by_batch()**, as métricas se comportarão como qualquer outra métrica de critério. Por exemplo:</span>
+<span id="cb24-206"><a href="#cb24-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-209"><a href="#cb24-209" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-210"><a href="#cb24-210" aria-hidden="true" tabindex="-1"></a>hpc <span class="sc">%&gt;%</span> </span>
+<span id="cb24-211"><a href="#cb24-211" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Resample) <span class="sc">%&gt;%</span></span>
+<span id="cb24-212"><a href="#cb24-212" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy_diff_by_batch</span>(obs, pred)</span>
+<span id="cb24-213"><a href="#cb24-213" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-214"><a href="#cb24-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-215"><a href="#cb24-215" aria-hidden="true" tabindex="-1"></a>As métricas de grupo formam o *back-end* das métricas de fairness em modelos organizados e, a partir dos conhecimentos adquidos até o momento, vamos estudá-los.</span>
+<span id="cb24-216"><a href="#cb24-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-217"><a href="#cb24-217" aria-hidden="true" tabindex="-1"></a><span class="fu"># Métricas Fairness</span></span>
+<span id="cb24-218"><a href="#cb24-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-219"><a href="#cb24-219" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
+<span id="cb24-220"><a href="#cb24-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-221"><a href="#cb24-221" aria-hidden="true" tabindex="-1"></a><span class="fu"># demographic_parity()</span></span>
+<span id="cb24-222"><a href="#cb24-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-223"><a href="#cb24-223" aria-hidden="true" tabindex="-1"></a><span class="fu"># equal_opportunity()</span></span>
+<span id="cb24-224"><a href="#cb24-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-225"><a href="#cb24-225" aria-hidden="true" tabindex="-1"></a><span class="fu"># equalized_odds()</span></span>
+<span id="cb24-226"><a href="#cb24-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-227"><a href="#cb24-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-228"><a href="#cb24-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-229"><a href="#cb24-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-230"><a href="#cb24-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-231"><a href="#cb24-231" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code><button title="Copiar para a área de transferência" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
