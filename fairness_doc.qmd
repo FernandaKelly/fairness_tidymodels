@@ -291,7 +291,7 @@ hpc %>%
 ```
 :::
 
-# Exemplos
+# Exemplos reais
 
 ## Are GPT detectors fair? A machine learning fairness case study
 
