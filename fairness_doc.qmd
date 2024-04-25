@@ -295,4 +295,6 @@ hpc %>%
 
 ## Are GPT detectors fair? A machine learning fairness case study
 
+Os lançamentos de modelos de linguagem são frequentemente seguidos por detectores, que afirmam detectar se o texto foi escrito por um ser humano ou por um determinado modelo de linguagem. Um estudo de 2023 argumenta que os detectores GPT classificam desproporcionalmente a escrita real de escritores ingleses não nativos como gerada por IA.
+
 ## Fair prediction of hospital readmission: a machine learning fairness case study
