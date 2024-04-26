@@ -333,16 +333,35 @@ utils::head(readmission,5)
 
 Essas variáveis são:
 
-- readmitted
-- race
-- sex
-- age
-- admission_source
-- blood_glucose
-- insurer
-- duration
-- n_previous_visits
-- n_diagnoses
-- n_procedures
-- n_medications
+- readmitted: Se o paciente foi readmitido nos 30 dias seguintes à alta. Um fator com níveis “Sim” e “Não”.
+- race: Raça relatada do paciente. Os dados de origem não documentam a estratégia de recolha de dados. Um fator com níveis "Afro-americano", "Asiático", "Caucasiano", "Hispânico", "Outro" e "Desconhecido".
+- sex: Sexo relatado do paciente. Os dados de origem não documentam a estratégia de recolha de dados. Um fator com níveis “Feminino” e “Masculino”.
+- age: Faixa etária do paciente, agrupada em intervalos de 10 anos. Um fator com os seguintes níveis:
+
+    - [0-10)
+    - [10-20)
+    - [20-30)
+    - [30-40)
+    - [40-50)
+    - [50-60)
+    - [60-70)
+    - [70-80)
+    - [80-90)
+    - [90-100)
+
+- admission_source: Se o paciente foi encaminhado por um médico, admitido pelo pronto-socorro ou chegou por alguma outra fonte. Fator com níveis “Emergência”, “Outros” e “Encaminhamento”.
+
+- blood_glucose: Resultados de um teste A1C, estimando a média de açúcar no sangue do paciente nos últimos 2-3 meses. Níveis médios estimados de glicose no sangue mais elevados estão associados a complicações do diabetes. Um fator com níveis "Normal", "Alto" e "Muito Alto" e muitos valores ausentes.
+
+- insurer: A seguradora de saúde (ou a falta dela, via “Autopagamento”) do paciente. Um fator com níveis "Medicaid", "Medicare", "Privado" e "Self-Pay" e muitos valores ausentes.
+
+- duration: Número de dias de internação entre a admissão e a alta.
+
+- n_previous_visits: Número de consultas de emergência, internação e ambulatorial no ano anterior ao encontro.
+
+- n_diagnoses: “Número de diagnósticos inseridos no sistema” durante o encontro.
+
+- n_procedures: “Número de procedimentos (exceto testes de laboratório) realizados” durante o encontro.
+
+- n_medications: “Número de nomes genéricos distintos administrados” durante o encontro.
 
