@@ -298,3 +298,17 @@ hpc %>%
 Os lançamentos de modelos de linguagem são frequentemente seguidos por detectores, que afirmam detectar se o texto foi escrito por um ser humano ou por um determinado modelo de linguagem. Um estudo de 2023 argumenta que os detectores GPT classificam desproporcionalmente a escrita real de escritores ingleses não nativos como gerada por IA.
 
 ## Fair prediction of hospital readmission: a machine learning fairness case study
+
+Com informações sobre a permanência de um paciente com diabetes em um hospital, como dados demográficos, resultados de diagnóstico, pagamento e medicamentos, um hospital pode treinar um modelo de aprendizado de máquina para prever razoavelmente bem se um paciente será readmitido dentro de 30 dias. Mas que danos para os pacientes poderiam resultar do uso de tal modelo?
+
+
+
+
+
+
+
+
+
+
+
+
