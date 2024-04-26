@@ -328,14 +328,18 @@ library(readmission)
 O banco de dados **readmission** possui 12 variáveis, como pode ser visto abaixo.
 
 ```{r}
-utils::head(readmission,5)
+dataFairness <- readmission::readmission
+utils::head(dataFairness,5)
 ```
 
 Essas variáveis são:
 
 - readmitted: Se o paciente foi readmitido nos 30 dias seguintes à alta. Um fator com níveis “Sim” e “Não”.
+
 - race: Raça relatada do paciente. Os dados de origem não documentam a estratégia de recolha de dados. Um fator com níveis "Afro-americano", "Asiático", "Caucasiano", "Hispânico", "Outro" e "Desconhecido".
+
 - sex: Sexo relatado do paciente. Os dados de origem não documentam a estratégia de recolha de dados. Um fator com níveis “Feminino” e “Masculino”.
+
 - age: Faixa etária do paciente, agrupada em intervalos de 10 anos. Um fator com os seguintes níveis:
 
     - [0-10)
@@ -364,4 +368,28 @@ Essas variáveis são:
 - n_procedures: “Número de procedimentos (exceto testes de laboratório) realizados” durante o encontro.
 
 - n_medications: “Número de nomes genéricos distintos administrados” durante o encontro.
+
+
+## Análise Descritiva
+
+```{r}
+dataFairness %>% 
+   janitor::tabyl(race, show_na = TRUE)
+```
+
+
+```{r}
+library(janitor)
+
+dataFairness %>% 
+   janitor::tabyl(readmitted, show_na = TRUE)
+```
+
+
+
+
+
+
+
+
 
