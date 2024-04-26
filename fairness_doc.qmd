@@ -314,8 +314,35 @@ Eles argumentam em sua análise que o modelo em questão apresenta um viés raci
 
 Este artigo demonstrará um fluxo de trabalho orientado para a justiça para treinar um modelo de aprendizado de máquina para identificar pacientes de alto risco. Ao longo do processo de desenvolvimento do modelo, consideraremos os impactos sociais que diferentes decisões de modelagem podem ter quando tal modelo é implantado no contexto.
 
+## Dados
 
+Os dados que usaremos nesta análise são um banco de dados disponível publicamente que contém informações sobre 71.515 internações hospitalares de pacientes com diabetes. Os dados vêm de um estudo de Strack et al. (2014), onde os autores modelam a eficácia de um determinado teste laboratorial na previsão de readmissão.
 
+Uma versão desses dados está disponível no pacote R de **readmission**:
 
+```{r}
+#install.packages("readmission")
+library(readmission)
+```
 
+O banco de dados **readmission** possui 12 variáveis, como pode ser visto abaixo.
+
+```{r}
+utils::head(readmission,5)
+```
+
+Essas variáveis são:
+
+- readmitted
+- race
+- sex
+- age
+- admission_source
+- blood_glucose
+- insurer
+- duration
+- n_previous_visits
+- n_diagnoses
+- n_procedures
+- n_medications
 
