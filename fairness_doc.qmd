@@ -299,13 +299,20 @@ Os lançamentos de modelos de linguagem são frequentemente seguidos por detecto
 
 ## Fair prediction of hospital readmission: a machine learning fairness case study
 
-Com informações sobre a permanência de um paciente com diabetes em um hospital, como dados demográficos, resultados de diagnóstico, pagamento e medicamentos, um hospital pode treinar um modelo de aprendizado de máquina para prever razoavelmente bem se um paciente será readmitido dentro de 30 dias. Mas que danos para os pacientes poderiam resultar do uso de tal modelo?
+Com informações sobre a permanência de um paciente com diabetes em um hospital, como dados demográficos, resultados de diagnóstico, pagamento e medicamentos, um hospital pode treinar um modelo de aprendizado de máquina para prever razoavelmente bem se um paciente será readmitido dentro de 30 dias. 
 
 
+Mas que danos para os pacientes poderiam resultar do uso de tal modelo?
 
 
+Em 2019, Obermeyer et al. (2019) publicaram uma análise das previsões de um modelo de aprendizado de máquina que os prestadores de cuidados de saúde usam para alocar recursos. Os resultados do modelo são usados ​​para recomendar um paciente para programas de gestão de cuidados de alto risco.
+
+Estes programas procuram melhorar o atendimento a pacientes com necessidades de saúde complexas, fornecendo recursos adicionais, incluindo maior atenção de prestadores treinados, para ajudar a garantir que os cuidados sejam bem coordenados. A maioria dos sistemas de saúde utiliza estes programas como a pedra angular dos esforços de gestão da saúde da população, e são amplamente considerados eficazes na melhoria dos resultados e da satisfação, ao mesmo tempo que reduzem os custos. […] Como os próprios programas são caros — com custos destinados a equipas de enfermeiros dedicados, horários extra de consultas de cuidados primários e outros recursos escassos — **os sistemas de saúde dependem extensivamente de algoritmos para identificar os pacientes que irão beneficiar mais**.
+
+Eles argumentam em sua análise que o modelo em questão apresenta um viés racial substancial, onde “os pacientes negros aos quais foi atribuído o mesmo nível de risco pelo algoritmo são mais doentes do que os pacientes brancos”. Na prática, isto resultou na redução “do número de pacientes negros identificados para cuidados adicionais em mais de metade”.
 
 
+Este artigo demonstrará um fluxo de trabalho orientado para a justiça para treinar um modelo de aprendizado de máquina para identificar pacientes de alto risco. Ao longo do processo de desenvolvimento do modelo, consideraremos os impactos sociais que diferentes decisões de modelagem podem ter quando tal modelo é implantado no contexto.
 
 
 
