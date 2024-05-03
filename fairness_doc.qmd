@@ -377,7 +377,7 @@ dataFairness %>%
    janitor::tabyl(race, show_na = TRUE)
 ```
 
-Observe as porcentagens onde houve readmissão. O que podemos inferir a raça?
+Observe as porcentagens onde houve readmissão. O que podemos inferir a questão de raça?
 
 ```{r}
 library(janitor)
