@@ -380,13 +380,14 @@ dataFairness %>%
    dplyr::mutate(porcent_n = round(percent*100,2))
 ```
 
-Observe as porcentagens onde houve readmissão. O que podemos inferir a questão de raça? É uma questão a se questionar.
+Observe abaixo as porcentagens onde houve readmissão por raça.
 
 ```{r}
 library(janitor)
 
 dataFairness %>% 
-   janitor::tabyl(readmitted, show_na = TRUE)
+   dplyr::group_by(readmitted) %>% 
+   janitor::tabyl(race, show_na = TRUE)
 ```
 
 
