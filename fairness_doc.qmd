@@ -380,10 +380,8 @@ dataFairness %>%
    dplyr::mutate(porcent_n = round(percent*100,2))
 ```
 
-Observe abaixo as porcentagens onde houve readmissão por raça. Veja que **9%** dos caucasianos e **8.50%** dos afro-americados tiveram uma readmissão entre aqueles que foram readmitidos em até 30 dias após a alta hospitalar. 
+Observe abaixo as porcentagens onde houve readmissão por raça. Veja que **9%** dos caucasianos e **8.50%** dos afro-americados tiveram uma readmissão, mas entre aqueles que foram readmitidos em até 30 dias após a alta hospitalar caucasianos tiveram **76.56%** e afro-americanos **17.37%** de readmissão.
 
-0.173685
-0.7656126
 
 ```{r}
 library(janitor)
