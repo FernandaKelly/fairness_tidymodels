@@ -372,9 +372,12 @@ Essas variáveis são:
 
 ## Análise Descritiva
 
+Podemos constatar que pessoas consideradas **caucaseanas** e **afro americanas** são quase **93%** de toda a população da base de dados e que **75%** é composto por apenas por pessoas **caucasianas**. 
+
 ```{r}
 dataFairness %>% 
-   janitor::tabyl(race, show_na = TRUE)
+   janitor::tabyl(race, show_na = TRUE) %>% 
+   dplyr::mutate(porcent_n = round(percent*100,2))
 ```
 
 Observe as porcentagens onde houve readmissão. O que podemos inferir a questão de raça? É uma questão a se questionar.
