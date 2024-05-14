@@ -380,7 +380,7 @@ dataFairness %>%
    dplyr::mutate(porcent_n = round(percent*100,2))
 ```
 
-Observe abaixo as porcentagens onde houve readmissão por raça.
+Observe abaixo as porcentagens onde houve readmissão por raça. Veja que **9%** dos caucasianos e **8.50** dos afro-americados tiveram uma readmissão.
 
 ```{r}
 library(janitor)
