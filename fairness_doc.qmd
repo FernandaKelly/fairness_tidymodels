@@ -372,7 +372,7 @@ Essas variáveis são:
 
 ## Análise Descritiva
 
-Podemos constatar que pessoas consideradas **caucaseanas** e **afro americanas** são quase **93%** de toda a população da base de dados e que **75%** é composto por apenas por pessoas **caucasianas**. 
+Podemos constatar que pessoas consideradas **caucasianas** e **afro americanas** são quase **93%** de toda a população da base de dados e que **75%** é composto por apenas por pessoas **caucasianas**. 
 
 ```{r}
 dataFairness %>% 
@@ -386,8 +386,8 @@ Observe abaixo as porcentagens onde houve readmissão por raça.
 library(janitor)
 
 dataFairness %>% 
-   dplyr::group_by(readmitted) %>% 
-   janitor::tabyl(race, show_na = TRUE)
+   dplyr::group_by(race, readmitted) %>% 
+  dplyr::count()
 ```
 
 
