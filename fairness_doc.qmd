@@ -396,9 +396,9 @@ dataFairness %>%
 
 As opções:
 
--   Remova linhas decorrentes de classes pouco frequentes. Neste exemplo, isso significaria remover todas as linhas com racevalores diferentes de "Caucasian"ou "African American". Esta é a abordagem adotada por outras análises públicas destes dados, incluindo o estudo original do qual estes dados surgiram. Uma análise resultante desta abordagem ignoraria quaisquer disparidades no cuidado de racegrupos diferentes de "Caucasian"ou "African American".
--   Crie métricas de justiça personalizadas que abordem o aumento da variabilidade associada a contagens menores. Poderíamos dimensionar a variabilidade das estimativas para cada racegrupo antes de calcular as métricas de justiça.
--   Agrupe os valores para aulas pouco frequentes. Isso implicaria o colapso de valores racediferentes de "Caucasian"e "African American"para um nível de fator. Esta abordagem é um tanto híbrida das duas abordagens acima; perdemos alguma granularidade nas informações relativas ao atendimento a racegrupos diferentes de "Caucasian"e "African American", mas reduzimos a variabilidade associada às estimativas para esses grupos no processo.
+-   Remova linhas decorrentes de classes pouco frequentes. Neste exemplo, isso significaria remover todas as linhas com valores diferentes de "Caucasian" ou "African American". Esta é a abordagem adotada por outras análises públicas destes dados, incluindo o estudo original do qual estes dados surgiram. Uma análise resultante desta abordagem ignoraria quaisquer disparidades no cuidado de grupos diferentes de "Caucasian" ou "African American".
+-   Crie métricas de justiça personalizadas que abordem o aumento da variabilidade associada a contagens menores. Poderíamos dimensionar a variabilidade das estimativas para cada grupo antes de calcular as métricas de justiça.
+-   Agrupar os valores das categorias pouco frequentes. Isso implicaria o colapso de valores dos grupos diferentes de "Caucasian"e "African American" para um nível de fator. Esta abordagem é um tanto híbrida das duas abordagens acima; perdemos alguma granularidade nas informações relativas ao atendimento dos grupos diferentes de "Caucasian"e "African American", mas reduzimos a variabilidade associada às estimativas para esses grupos no processo.
 
 
 
