@@ -372,13 +372,38 @@ Essas variáveis são:
 
 ## Análise Descritiva
 
-Podemos constatar que pessoas consideradas **caucasianas** e **afro americanas** são quase **93%** de toda a população da base de dados e que **75%** é composto por apenas por pessoas **caucasianas**. 
+Podemos constatar que pessoas consideradas **caucasianas** e **afro americanas** são quase **93%** de toda a população da base de dados e que **75%** é composto por apenas por pessoas **caucasianas**. As outras raças **Asian**, **Hispanic**, **Other** e **Unknown** possuem frequência baixa e, consequentemente, discrepantes das categorias de interesse. Essa discrepância **também** é um fator que deve ser considerado nas análises.
 
 ```{r}
 dataFairness %>% 
    janitor::tabyl(race, show_na = TRUE) %>% 
    dplyr::mutate(porcent_n = round(percent*100,2))
 ```
+
+
+Nós temos três opções para lidar com essa discrepância, visto que na reamostragem, a análise das categorias de baixa frequência podem interferir nos resultados.
+
+```{r}
+library(tidyverse)
+dataFairness %>%
+  dplyr::mutate(., group = sample(1:10, nrow(.), replace = TRUE)) %>%
+  dplyr::group_by(race, group) %>%
+  dplyr::summarize(prop = mean(readmitted == "Yes"), n = n()) %>%
+  dplyr::summarize(mean = mean(prop), sd = sd(prop), n = sum(n))
+
+```
+
+
+As opções:
+
+-   Remova linhas decorrentes de classes pouco frequentes. Neste exemplo, isso significaria remover todas as linhas com racevalores diferentes de "Caucasian"ou "African American". Esta é a abordagem adotada por outras análises públicas destes dados, incluindo o estudo original do qual estes dados surgiram. Uma análise resultante desta abordagem ignoraria quaisquer disparidades no cuidado de racegrupos diferentes de "Caucasian"ou "African American".
+-   Crie métricas de justiça personalizadas que abordem o aumento da variabilidade associada a contagens menores. Poderíamos dimensionar a variabilidade das estimativas para cada racegrupo antes de calcular as métricas de justiça.
+-   Agrupe os valores para aulas pouco frequentes. Isso implicaria o colapso de valores racediferentes de "Caucasian"e "African American"para um nível de fator. Esta abordagem é um tanto híbrida das duas abordagens acima; perdemos alguma granularidade nas informações relativas ao atendimento a racegrupos diferentes de "Caucasian"e "African American", mas reduzimos a variabilidade associada às estimativas para esses grupos no processo.
+
+
+
+
+
 
 Observe abaixo as porcentagens onde houve readmissão por raça. Veja que **9%** dos caucasianos e **8.50%** dos afro-americados tiveram uma readmissão, mas entre aqueles que foram readmitidos em até 30 dias após a alta hospitalar caucasianos tiveram **76.56%** e afro-americanos **17.37%** de readmissão.
 
