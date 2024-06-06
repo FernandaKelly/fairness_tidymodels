@@ -474,11 +474,22 @@ ggplot(dataFairness) +
 
 # insurer
 
+Embora faltem informações de pagamento sobre a maioria dos pacientes, a maioria dos pacientes nesses dados são cobertos pelo Medicare. O método de pagamento é uma forma pela qual a injustiça social pode ser refletida nos dados de origem, além das variáveis sobre os próprios grupos protegidos. A cobertura do Medicaid está disponível apenas para pessoas abaixo de uma determinada renda, e muitos pacientes que pagam por conta própria não têm seguro médico porque não podem pagar por ele. Da mesma forma, as taxas de pobreza diferem drasticamente entre os grupos raciais nos EUA.
+
 ```{r}
 ggplot(dataFairness) +
  aes(x = insurer) +
  geom_bar(fill = "#332DEF") +
  theme_gray()
+```
+# Continuous variables
+
+```{r}
+dataFairness %>%
+  tidyr::pivot_longer(starts_with("n_")) %>%
+         ggplot(aes(x = value)) +
+         geom_histogram() +
+         facet_wrap(vars(name), scales = "free_x")
 ```
 
 :::
