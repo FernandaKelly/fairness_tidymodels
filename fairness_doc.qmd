@@ -440,6 +440,8 @@ Traçando distribuições dos preditores restantes como:
 
 # Age
 
+Podemos observar que a idade mais recorrente entre os pacientes é entre 50 e 80 anos.
+
 ```{r}
 library(ggplot2)
 
@@ -475,23 +477,6 @@ ggplot(dataFairness) +
  aes(x = insurer) +
  geom_bar(fill = "#332DEF") +
  theme_gray()
-```
-
-```{r}
-ggplot(dataFairness) +
- aes(x = race_catNew, fill = insurer) +
- geom_bar() +
- scale_fill_hue(direction = 1) +
- theme_gray()
-```
-
-
-```{r}
-ggplot(dataFairness) +
- aes(x = race_catNew) +
- geom_bar(fill = "#332DEF") +
- theme_gray() +
- facet_wrap(vars(insurer))
 ```
 
 
