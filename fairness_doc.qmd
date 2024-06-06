@@ -498,11 +498,11 @@ dataFairness %>%
 
 # Reamostragem
 
-Com a função **initial_split** temos dois parâmetros para codificar a proporção ou o estrato da reamostragem, são eles:
+Com a função **initial_split** temos dois parâmetros para codificar a proporção (o mais utilizado) ou o estrato da reamostragem, são eles:
 
-- prop
+-   prop: A proporção de dados a serem retidos para modelagem/análise.
 
-- strata
+-   strata: Uma variável nos dados (caractere único ou nome) usada para conduzir **amostragem estratificada**. Quando não for NULL, cada reamostragem é criada dentro da variável de estratificação. Os estratos numéricos são divididos em quartis.
 
 
 
