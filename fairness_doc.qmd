@@ -411,8 +411,20 @@ As opções:
 -   Crie métricas de justiça personalizadas que abordem o aumento da variabilidade associada a contagens menores. Poderíamos dimensionar a variabilidade das estimativas para cada grupo antes de calcular as métricas de justiça.
 -   Agrupar os valores das categorias pouco frequentes. Isso implicaria o colapso de valores dos grupos diferentes de "Caucasian"e "African American" para um nível de fator. Esta abordagem é um tanto híbrida das duas abordagens acima; perdemos alguma granularidade nas informações relativas ao atendimento dos grupos diferentes de "Caucasian"e "African American", mas reduzimos a variabilidade associada às estimativas para esses grupos no processo.
 
-**Em nosso caso, vamos considerar a última opção.**
+**Em nosso caso, vamos considerar a última opção agrupando as categorias Hispanic, Other, Asian e Unknown**
 
+Sendo assim, adicionarei uma nova coluna com a nova configuração da variável **race**.
+
+```{r}
+dataFairness <- dataFairness %>%
+                  dplyr::mutate(
+                    race_catNew = case_when(
+                      !(race %in% c("Caucasian", "African American")) ~ "Other",
+                      .default = race
+                    ),
+                    race = factor(race)
+                  )
+```
 
 
 
