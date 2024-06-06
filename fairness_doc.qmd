@@ -426,7 +426,86 @@ dataFairness <- dataFairness %>%
                   )
 ```
 
+A nova frequência que temos é,
 
+```{r}
+dataFairness %>% 
+   janitor::tabyl(race_catNew, show_na = TRUE) %>% 
+   dplyr::mutate(porcent_n = round(percent*100,2))
+```
+
+Traçando distribuições dos preditores restantes como:
+
+::: panel-tabset
+
+# Age
+
+```{r}
+library(ggplot2)
+
+ggplot(dataFairness) +
+ aes(x = age) +
+ geom_bar(fill = "#332DEF") +
+ theme_gray()
+```
+
+
+# Sex
+
+```{r}
+ggplot(dataFairness) +
+ aes(x = sex) +
+ geom_bar(fill = "#332DEF") +
+ theme_gray()
+```
+
+# admission_source
+
+```{r}
+ggplot(dataFairness) +
+ aes(x = admission_source) +
+ geom_bar(fill = "#332DEF") +
+ theme_gray()
+```
+
+# insurer
+
+```{r}
+ggplot(dataFairness) +
+ aes(x = insurer) +
+ geom_bar(fill = "#332DEF") +
+ theme_gray()
+```
+
+```{r}
+ggplot(dataFairness) +
+ aes(x = race_catNew, fill = insurer) +
+ geom_bar() +
+ scale_fill_hue(direction = 1) +
+ theme_gray()
+```
+
+
+```{r}
+ggplot(dataFairness) +
+ aes(x = race_catNew) +
+ geom_bar(fill = "#332DEF") +
+ theme_gray() +
+ facet_wrap(vars(insurer))
+```
+
+
+# readmitted
+
+```{r}
+ggplot(dataFairness) +
+ aes(x = race_catNew, fill = readmitted) +
+ geom_bar() +
+ scale_fill_hue(direction = 1) +
+ theme_gray()
+```
+
+:::
 
 
 
