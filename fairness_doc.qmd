@@ -484,6 +484,8 @@ ggplot(dataFairness) +
 ```
 # Continuous variables
 
+Para muitos pacientes, esta foi a primeira visita hospitalar neste sistema hospitalar. Durante a estadia, muitos pacientes recebem de 10 a 20 medicamentos e passam por vários procedimentos.
+
 ```{r}
 dataFairness %>%
   tidyr::pivot_longer(starts_with("n_")) %>%
@@ -494,6 +496,24 @@ dataFairness %>%
 
 :::
 
+# Reamostragem
+
+Com a função **initial_split** temos dois parâmetros para codificar a proporção ou o estrato da reamostragem, são eles:
+
+- prop
+
+- strata
+
+
+
+```{r}
+set.seed(1)
+
+readmission_splits <- rsample::initial_split(dataFairness, strata = readmitted)
+
+readmission_train  <- rsample::training(readmission_splits)
+readmission_test   <- rsample::testing(readmission_splits)
+```
 
 
 
