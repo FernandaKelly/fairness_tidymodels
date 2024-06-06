@@ -463,6 +463,8 @@ ggplot(dataFairness) +
 
 # admission_source
 
+As emergências são responsáveis pela maioria das admissões nestes dados, embora muitas outras sejam provenientes de referências ou outras fontes.
+
 ```{r}
 ggplot(dataFairness) +
  aes(x = admission_source) +
@@ -476,17 +478,6 @@ ggplot(dataFairness) +
 ggplot(dataFairness) +
  aes(x = insurer) +
  geom_bar(fill = "#332DEF") +
- theme_gray()
-```
-
-
-# readmitted
-
-```{r}
-ggplot(dataFairness) +
- aes(x = race_catNew, fill = readmitted) +
- geom_bar() +
- scale_fill_hue(direction = 1) +
  theme_gray()
 ```
 
