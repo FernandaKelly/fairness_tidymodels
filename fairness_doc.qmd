@@ -531,5 +531,16 @@ Após o particionamento, a estimação do modelo é realizada e, posteriormente,
 -   Método k-fold: O método de validação cruzada denominado k-fold consiste em dividir o conjunto total de dados em k subconjuntos mutuamente exclusivos do mesmo tamanho e, a partir daí, um subconjunto é utilizado para teste e os k-1 restantes são utilizados para estimação dos parâmetros, fazendo-se o cálculo da acurácia do modelo. Este processo é realizado k vezes alternando de forma circular o subconjunto de teste.
 -   Método leave-one-out: O método leave-one-out é um caso específico do k-fold, com k igual ao número total de dados N. Nesta abordagem são realizados N cálculos de erro, um para cada dado.
 
+Nessa aplicação, nós vamos optar por utilizar o **método k-fold**, em que dividiremos as 53.636 observações dos dados de treinamento em 10 reamostras (folds). Para isso a função **vfold_cv** do pacote **rsample** irá nos ajudar com maestria, seus parâmetros são:
 
+-   data: quadro de dados.
+-   v: O número de partições do conjunto de dados.
+-   repeats: O número de vezes para repetir o particionamento em V.
+-   strata: Uma variável nos dados (caractere único ou nome) usada para conduzir amostragem estratificada. Quando não for NULL, cada reamostragem é criada dentro da variável de estratificação. Os estratos numéricos são divididos em quartis.
+
+
+```{r}
+readmission_folds <- rsample::vfold_cv(readmission_train, v = 10, repeats = 1, strata = readmitted)
+readmission_folds
+```
 
