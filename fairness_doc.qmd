@@ -504,7 +504,7 @@ Com a função **initial_split** temos dois parâmetros para codificar a propor�
 
 -   strata: Uma variável nos dados (caractere único ou nome) usada para conduzir **amostragem estratificada**. Quando não for NULL, cada reamostragem é criada dentro da variável de estratificação. Os estratos numéricos são divididos em quartis.
 
-Neste caso, vamos utilizar a opção de **strata** com a variável **readmitted** com o objetivo de abordar o desequilíbrio de classe. Para saber mais sobre desequilíbrios de classe e estratificação, consulte o capítulo “Métodos comuns para divisão de dados” de Modelagem organizada com R (Kuhn e Silge 2022) que é incrível e vai te ajudar a entender a escolha da utilização dessa reamostragem.
+Neste caso, vamos utilizar a opção de **strata** com a variável **readmitted** com o objetivo de abordar o desequilíbrio de classe, visto que somente **8%** do banco de dados tiveram readmissão. Para saber mais sobre desequilíbrios de classe e estratificação, consulte o capítulo “Métodos comuns para divisão de dados” de Modelagem organizada com R (Kuhn e Silge 2022) que é incrível e vai te ajudar a entender a escolha da utilização dessa reamostragem.
 
 ```{r}
 set.seed(1)
