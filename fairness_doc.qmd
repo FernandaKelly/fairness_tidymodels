@@ -498,23 +498,38 @@ dataFairness %>%
 
 # Reamostragem
 
-Com a função **initial_split** temos dois parâmetros para codificar a proporção (o mais utilizado) ou o estrato da reamostragem, são eles:
+Com a função **initial_split** temos dois parâmetros para codificar a proporção (o mais utilizado especificando 1/4 do banco de dados para teste) ou o estrato da reamostragem, são eles:
 
--   prop: A proporção de dados a serem retidos para modelagem/análise.
+-   prop: A proporção de dados a serem retidos para modelagem/análise. Este é um processo de amostragem aleatória simples.
 
 -   strata: Uma variável nos dados (caractere único ou nome) usada para conduzir **amostragem estratificada**. Quando não for NULL, cada reamostragem é criada dentro da variável de estratificação. Os estratos numéricos são divididos em quartis.
 
-Neste caso, vamos utilizar a opção de **strata** com a variável **readmitted** com o objetivo de abordar o desequilíbrio de classe, visto que somente **8%** do banco de dados tiveram readmissão. Para saber mais sobre desequilíbrios de classe e estratificação, consulte o capítulo “Métodos comuns para divisão de dados” de Modelagem organizada com R (Kuhn e Silge 2022) que é incrível e vai te ajudar a entender a escolha da utilização dessa reamostragem.
+Usar uma amostra aleatória simples pode alocar aleatoriamente essas amostras pouco frequentes de forma desproporcional no conjunto de treinamento ou teste. Por isso, vamos utilizar a opção de **strata** com a variável **readmitted** com o objetivo de abordar o desequilíbrio de classe, visto que somente **8%** do banco de dados tiveram readmissão. 
+
+Para saber mais sobre desequilíbrios de classe e estratificação, consulte o capítulo “Métodos comuns para divisão de dados” de [Modelagem organizada com R (Kuhn e Silge 2022)](https://www.tmwr.org/) que é incrível e vai te ajudar a entender a escolha da utilização dessa reamostragem. 
+
+Sendo assim, temos 53636 observações no conjunto de treino e 17879 observações no conjunto de teste conjunto de teste para calcularmos uma estimativa final de nosso desempenho no modelo escolhido.
 
 ```{r}
 set.seed(1)
 
-readmission_splits <- rsample::initial_split(dataFairness, strata = readmitted)
+readmission_splits <- rsample::initial_split(dataFairness,  prop = 3/4, strata = readmitted)
 
 readmission_train  <- rsample::training(readmission_splits)
 readmission_test   <- rsample::testing(readmission_splits)
 ```
 
+A partir do conjunt de treino, iremos utilizar o método de validação cruzada que é uma técnica para avaliar a capacidade de generalização de um modelo, a partir de um conjunto de dados. 
+
+O conceito central das técnicas de validação cruzada é o particionamento do conjunto de dados em subconjuntos mutuamente exclusivos, e posteriormente, o uso de alguns destes subconjuntos para a estimação dos parâmetros do modelo (dados de treinamento), sendo os subconjuntos restantes (dados de validação ou de teste) empregados na validação do modelo.
+
+Há três métodos mais conhecidos para esta tarefa:
+
+-   Método holdout: Este método consiste em dividir o conjunto total de dados em dois subconjuntos mutuamente exclusivos, um para treinamento (estimação dos parâmetros) e outro para teste (validação). O conjunto de dados pode ser separado em quantidades iguais ou não. Uma proporção muito comum é considerar 2/3 dos dados para treinamento e o 1/3 restante para teste.
+
+Após o particionamento, a estimação do modelo é realizada e, posteriormente, os dados de teste são aplicados e o erro de predição calculado.
+-   Método k-fold: O método de validação cruzada denominado k-fold consiste em dividir o conjunto total de dados em k subconjuntos mutuamente exclusivos do mesmo tamanho e, a partir daí, um subconjunto é utilizado para teste e os k-1 restantes são utilizados para estimação dos parâmetros, fazendo-se o cálculo da acurácia do modelo. Este processo é realizado k vezes alternando de forma circular o subconjunto de teste.
+-   Método leave-one-out: O método leave-one-out é um caso específico do k-fold, com k igual ao número total de dados N. Nesta abordagem são realizados N cálculos de erro, um para cada dado.
 
 
 
