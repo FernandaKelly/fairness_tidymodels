@@ -615,7 +615,12 @@ spec_nn <- parsnip::bag_mlp("classification",
 Agora combinamos cada combinação única de receita e pré-processador em um conjunto de fluxo de trabalho:
 
 ```{r}
-library(workflows)
+install.packages("workflowsets")
+pak::pak("tidymodels/workflowsets")
+library(workflowsets)
+
+install.packages("C:/home/fernanda/Downloads/workflowsets_1.1.0.tar.gz", repos = NULL)
+
 wflow_set <-  workflow_set(
     preproc = list(basic = recipe_basic, age = recipe_age),
     models = list(lr = spec_lr, bt = spec_bt, nn = spec_nn)
