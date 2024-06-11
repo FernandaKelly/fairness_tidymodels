@@ -544,3 +544,101 @@ readmission_folds <- rsample::vfold_cv(readmission_train, v = 10, repeats = 1, s
 readmission_folds
 ```
 
+# Modelos de treinamento e avaliação
+
+## Fluxo de trabalho
+
+Para o desenho do fluxo de trabalho utilizaremos o pacite **recipes**. Com esse pacote você pode usar sequências canalizáveis semelhantes a dplyr de etapas de engenharia de recursos para preparar seus dados para modelagem. Nós vamos utilizar a seguinte "receita":
+
+-   step_unknown: step_unknown cria uma especificação de uma etapa de receita que atribuirá um valor ausente em um nível de fator a "unknown"
+-   step_YeoJohnson:
+-   step_normalize: cria uma especificação de uma etapa de receita que normalizará os dados numéricos para ter um desvio padrão de um e uma média de zero.
+-   step_dummy: cria uma especificação de uma etapa de receita que converterá dados nominais (por exemplo, caracteres ou fatores) em um ou mais termos do modelo binário numérico para os níveis dos dados originais.
+
+O outro pré-processador que tentaremos codifica a idade como uma variável numérica em vez dos compartimentos como nos dados de origem:
+```{r}
+library(recipes)
+
+age_bin_to_midpoint <- function(age_bin) {
+  age <- as.character(age_bin) 
+  age <- substr(age, 2, 2)
+  age <- as.numeric(age)
+  age * 10 + 5
+}
+
+recipe_basic <-
+  recipe(readmitted ~ ., data = dataFairness) %>%
+  step_unknown(all_nominal_predictors()) %>%
+  step_YeoJohnson(all_numeric_predictors()) %>%
+  step_normalize(all_numeric_predictors()) %>%
+  step_dummy(all_nominal_predictors())
+
+recipe_age <-  recipes::recipe(readmitted ~ ., data = dataFairness) %>%
+                 recipes::step_mutate(age_num = age_bin_to_midpoint(age)) %>%
+                 recipes::step_rm(age) %>%
+                 recipes::step_unknown(all_nominal_predictors()) %>%
+                 recipes::step_YeoJohnson(all_numeric_predictors()) %>%
+                 recipes::step_normalize(all_numeric_predictors()) %>%
+                 recipes::step_dummy(all_nominal_predictors())
+```
+
+
+Ambas as receitas serão combinadas com um dos três modelos. **Regressões logísticas**, **XGBoost** e **redes neurais** empacotadas fazem um conjunto diversificado de suposições sobre o processo subjacente de geração de dados. 
+
+Definindo especificações de modelo para cada um utilizando o pacote **parsnip**:
+
+-   logistic_reg: define um modelo linear generalizado para resultados binários. Uma combinação linear dos preditores é usada para modelar as probabilidades logarítmicas de um evento. Esta função pode caber em modelos de classificação.
+
+-   boost_tree: define um modelo que cria uma série de árvores de decisão formando um conjunto. Cada árvore depende dos resultados das árvores anteriores. Todas as árvores do conjunto são combinadas para produzir uma previsão final. Esta função pode ajustar modelos de classificação, regressão e regressão censurada.
+
+-   bag_mlp: define um conjunto de redes neurais feed-forward de camada única. Esta função pode ajustar modelos de classificação e regressão.
+
+Você pode observar que em muitos parâmetros utilizamo o pacote **tune**, que tem o objetivo de facilitar o ajuste de hiperparâmetros para os pacotes tidymodels. Para a modelagem do XGBoost "tunamos" os parâmetros **mtry** que dita um número para o número (ou proporção) de preditores que serão amostrados aleatoriamente em cada divisão ao criar os modelos de árvore (somente mecanismos específicos) e a **learn_rate** que dita um número para a taxa na qual o algoritmo de reforço se adapta de iteração para iteração (somente mecanismos específicos). **Isso às vezes é chamado de parâmetro de contração**.
+
+```{r}
+library(parsnip)
+spec_lr <- parsnip::logistic_reg(mode = "classification", 
+                                 engine = "glm", 
+                                 penalty = NULL, 
+                                 mixture = NULL)
+
+spec_bt <- parsnip::boost_tree("classification", 
+                               mtry = tune(), 
+                               learn_rate = tune(), 
+                               trees = 500)
+
+spec_nn <- parsnip::bag_mlp("classification", 
+                            hidden_units = tune(), 
+                            penalty = tune())
+```
+
+Agora combinamos cada combinação única de receita e pré-processador em um conjunto de fluxo de trabalho:
+
+```{r}
+library(workflows)
+wflow_set <-  workflow_set(
+    preproc = list(basic = recipe_basic, age = recipe_age),
+    models = list(lr = spec_lr, bt = spec_bt, nn = spec_nn)
+  )
+```
+
+
+## Métricas
+
+As métricas com as quais escolhemos avaliar os nossos modelos são o núcleo da nossa análise de justiça. Além das métricas padrão para classificação em sintonia accuracy()e roc_auc(), calcularemos um conjunto de métricas de justiça: equal_opportunity(),, equalized_odds() e demographic_parity().
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
