@@ -23,15 +23,25 @@ execute:
   echo: true
 ---
 
+```{r}
+library(tidyverse)
+library(yardstick)
+library(dplyr)
+```
+
 # Leitura de dados
 
 ## The admissions table
+
+```{r}
+ADMISSIONS_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/ADMISSIONS.csv.gz")
+```
 
 A tabela de dados de **admissão** possui 58976 observações. Ela fornece fornece informações sobre a admissão de um paciente no hospital. Como cada visita única ao hospital para um paciente recebe um **HADM_ID**, a tabela ADMISSIONS pode ser considerada uma tabela de definição para **HADM_ID**. As informações disponíveis incluem informações de tempo para admissão e alta, informações demográficas, a fonte da admissão e assim por diante.
 
 Há as seguintes variáveis na tabela de dados:
 
--   ROW_ID\
+-   ROW_ID
 
 -   SUBJECT_ID E HADM_ID: Cada linha desta tabela contém um HADM_ID, que representa a admissão de um único paciente no hospital. HADM_ID varia de 1000000 - 1999999. É possível que esta tabela tenha SUBJECT_ID, indicando que um único paciente teve várias admissões no hospital.
 
@@ -63,11 +73,9 @@ Há as seguintes variáveis na tabela de dados:
 
 -   HAS_CHARTEVENTS_DATA
 
-```{r}
-ADMISSIONS_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/ADMISSIONS.csv.gz")
-```
 
 
+### Descritiva
 
 
 
