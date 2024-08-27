@@ -25,14 +25,47 @@ execute:
 
 # Leitura de dados
 
+## The admissions table
+
+A tabela de dados de **admissão** possui 58976 observações. Ela fornece fornece informações sobre a admissão de um paciente no hospital. Como cada visita única ao hospital para um paciente recebe um **HADM_ID**, a tabela ADMISSIONS pode ser considerada uma tabela de definição para **HADM_ID**. As informações disponíveis incluem informações de tempo para admissão e alta, informações demográficas, a fonte da admissão e assim por diante. 
+
+Há as seguintes variáveis na tabela de dados:
+
+- ROW_ID	
+- SUBJECT_ID
+- HADM_ID
+- ADMITTIME
+- DISCHTIME
+- DEATHTIME
+- ADMISSION_TYPE
+- ADMISSION_LOCATION
+- DISCHARGE_LOCATION
+- INSURANCE
+- LANGUAGE
+- RELIGION
+- MARITAL_STATUS
+- ETHNICITY
+- EDREGTIME
+- EDOUTTIME
+- DIAGNOSIS
+- HOSPITAL_EXPIRE_FLAG
+- HAS_CHARTEVENTS_DATA
+
+
+
+
 ```{r}
 ADMISSIONS_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/ADMISSIONS.csv.gz")
-D_ICD_DIAGNOSES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_DIAGNOSES.csv.gz")
-D_ICD_PROCEDURES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_PROCEDURES.csv.gz")
-
-
-
-
-
 ```
 
+##
+
+```{r}
+D_ICD_DIAGNOSES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_DIAGNOSES.csv.gz")
+```
+
+## 
+
+```{r}
+D_ICD_PROCEDURES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_PROCEDURES.csv.gz")
+```
