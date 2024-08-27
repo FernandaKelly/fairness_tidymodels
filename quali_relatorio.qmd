@@ -27,38 +27,58 @@ execute:
 
 ## The admissions table
 
-A tabela de dados de **admissão** possui 58976 observações. Ela fornece fornece informações sobre a admissão de um paciente no hospital. Como cada visita única ao hospital para um paciente recebe um **HADM_ID**, a tabela ADMISSIONS pode ser considerada uma tabela de definição para **HADM_ID**. As informações disponíveis incluem informações de tempo para admissão e alta, informações demográficas, a fonte da admissão e assim por diante. 
+A tabela de dados de **admissão** possui 58976 observações. Ela fornece fornece informações sobre a admissão de um paciente no hospital. Como cada visita única ao hospital para um paciente recebe um **HADM_ID**, a tabela ADMISSIONS pode ser considerada uma tabela de definição para **HADM_ID**. As informações disponíveis incluem informações de tempo para admissão e alta, informações demográficas, a fonte da admissão e assim por diante.
 
 Há as seguintes variáveis na tabela de dados:
 
-- ROW_ID	
-- SUBJECT_ID
-- HADM_ID
-- ADMITTIME
-- DISCHTIME
-- DEATHTIME
-- ADMISSION_TYPE
-- ADMISSION_LOCATION
-- DISCHARGE_LOCATION
-- INSURANCE
-- LANGUAGE
-- RELIGION
-- MARITAL_STATUS
-- ETHNICITY
-- EDREGTIME
-- EDOUTTIME
-- DIAGNOSIS
-- HOSPITAL_EXPIRE_FLAG
-- HAS_CHARTEVENTS_DATA
+-   ROW_ID\
 
+-   SUBJECT_ID E HADM_ID: Cada linha desta tabela contém um HADM_ID, que representa a admissão de um único paciente no hospital. HADM_ID varia de 1000000 - 1999999. É possível que esta tabela tenha SUBJECT_ID, indicando que um único paciente teve várias admissões no hospital.
 
+-   ADMITTIME, DISCHTIME E DEATHTIME: ADMITTIME fornece a data e a hora em que o paciente foi admitido no hospital, enquanto DISCHTIME fornece a data e a hora em que o paciente recebeu alta do hospital. Se aplicável, DEATHTIME fornece a hora da morte do paciente no hospital. Observe que DEATHTIME está presente somente se o paciente morreu no hospital e é quase sempre o mesmo que o do paciente DISCHTIME.
 
+-   ADMISSION_TYPE: ADMISSION_TYPE descreve o tipo de admissão: 'ELETIVO', 'URGENTE', 'RECÉM-NASCIDO' ou 'EMERGÊNCIA'. Emergência/urgente indicam cuidados médicos não planejados e são frequentemente agrupados em uma única categoria em estudos. Eletivo indica uma admissão hospitalar previamente planejada. Recém-nascido indica que HADM_ID diz respeito ao nascimento do paciente.
+
+-   ADMISSION_LOCATION: ADMISSION_LOCATIONfornece informações sobre a localização anterior do paciente antes de chegar ao hospital. Existem 9 valores possíveis:
+
+    -   ADMISSÃO NO PRONTO-SISTEMA
+    -   TRANSFERÊNCIA DO HOSP/EXTRAM
+    -   TRANSFERÊNCIA DE OUTRO SERVIÇO DE SAÚDE
+    -   ENCAMINHAMENTO CLÍNICO/PREMATURO
+    -   **INFORMAÇÃO NÃO DISPONÍVEL**
+    -   TRANSFERÊNCIA DE ENFERMEIRO ESPECIALIZADO
+    -   TRSF DENTRO DESTA INSTALAÇÃO
+    -   REFERÊNCIA HMO/DOENTE
+    -   ENCAMINHAMENTO FÍSICO/DELI NORMAL
+
+-   DISCHARGE_LOCATION
+
+-   INSURANCE, LANGUAGE, RELIGION, MARITAL_STATUS e ETHNICITY: As colunas INSURANCE, LANGUAGE, RELIGION, MARITAL_STATUS, ETHNICITYdescrevem dados demográficos do paciente. Essas colunas ocorrem na tabela ADMISSIONS, pois são originalmente obtidas dos dados de admissão, alta e transferências (ADT) do banco de dados do hospital.
+
+-   EDREGTIME e EDOUTTIME: Horário em que o paciente foi registrado e recebeu alta do pronto-socorro.
+
+-   DIAGNOSIS: A DIAGNOSIS coluna fornece um diagnóstico preliminar de texto livre para o paciente na admissão hospitalar. O diagnóstico é geralmente atribuído pelo clínico que faz a admissão e não usa uma ontologia sistemática. A partir do MIMIC-III v1.0, havia 15.693 diagnósticos distintos para 58.976 admissões. Os diagnósticos podem ser muito informativos (por exemplo, insuficiência renal crônica) ou bastante vagos (por exemplo, fraqueza). Os diagnósticos finais para a internação hospitalar de um paciente são codificados na alta e podem ser encontrados na tabela DIAGNOSES_ICD. 
+
+-   HOSPITAL_EXPIRE_FLAG: Isso indica se o paciente morreu durante a hospitalização em questão, 1 indica morte no hospital e 0 indica sobrevivência até a alta hospitalar.
+
+-   HAS_CHARTEVENTS_DATA
 
 ```{r}
 ADMISSIONS_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/ADMISSIONS.csv.gz")
 ```
 
-##
+
+
+
+
+
+
+
+
+
+
+
+## 
 
 ```{r}
 D_ICD_DIAGNOSES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_DIAGNOSES.csv.gz")
