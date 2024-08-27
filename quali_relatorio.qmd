@@ -23,4 +23,16 @@ execute:
   echo: true
 ---
 
-# Universo Tidymodels
+# Leitura de dados
+
+```{r}
+ADMISSIONS_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/ADMISSIONS.csv.gz")
+D_ICD_DIAGNOSES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_DIAGNOSES.csv.gz")
+D_ICD_PROCEDURES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_PROCEDURES.csv.gz")
+
+
+
+
+
+```
+
