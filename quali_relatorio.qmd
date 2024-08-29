@@ -123,7 +123,7 @@ A partir dessa caracterização de amostra, é necessário fazer o join com a ba
 
 ```{r}
 ADMISSIONS_merge <- ADMISSIONS_csv %>% 
-                    dplyr::left_join()
+                    dplyr::left_join(PATIENTS_csv, by = "SUBJECT_ID")
 ```
 
 
