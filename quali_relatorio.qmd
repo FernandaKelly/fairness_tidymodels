@@ -106,6 +106,10 @@ Das admissões, no geral,  **71% (42.071)** são admissões de **emergência**. 
 ADMISSIONS_csv %>% 
   janitor::tabyl(ADMISSION_TYPE)
 ```
+```{r}
+ADMISSIONS_csv <- ADMISSIONS_csv %>% 
+                  dplyr::filter(ADMISSION_TYPE == "EMERGENCY" | ADMISSION_TYPE == "URGENT")
+```
 
 A partir dessa caracterização de amostra, é necessário fazer o join com a base dados nomeada por **The patients table** e que contém as seguintes informações de interesse:
 
@@ -117,6 +121,10 @@ A partir dessa caracterização de amostra, é necessário fazer o join com a ba
 - EXPIRE_FLAG: é um sinalizador binário que indica se o paciente morreu, ou seja, se DODé nulo ou não.
 
 
+```{r}
+ADMISSIONS_merge <- ADMISSIONS_csv %>% 
+                    dplyr::left_join()
+```
 
 
 
