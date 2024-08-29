@@ -77,22 +77,56 @@ Há as seguintes variáveis na tabela de dados:
 
 ### Descritiva
 
+```{r}
+#| echo: false
+library(esquisse)
+```
+
+Na base de dados temos 58976 observações, mas vale ressaltar que um único paciente pode ter várias admissões e cada uma é uma observação no banco de dados. Sendo assim, temos **46.520 pacientes**. 
+
+```{r}
+ADMISSIONS_csv %>% 
+  dplyr::distinct(SUBJECT_ID) 
+```
+
+Inicialmente é importante entender quantos pacientes tiveram mais de uma admissão. De acordo com a tabela abaixo, **17% (7.537)** dos pacientes tiveram mais ou igual a 2 duas admissões. **Vale ressaltar que as admissões podem ter intervalos e causas diferentes.**.
+
+```{r} 
+ADMISSIONS_csv %>% 
+  dplyr::group_by(SUBJECT_ID) %>% 
+  dplyr::summarise(n_subject = n()) %>% 
+  dplyr::arrange(desc(n_subject)) %>% 
+  dplyr::filter(n_subject >=2) %>% 
+  dplyr::count()
+```
+
+Das admissões, no geral,  **71% (42.071)** são admissões de **emergência**. É esperado que **emergência** e **urgência** sejam agrupadas devida ao cenário de ambas serem similares e, se forem agrupadas, teremos uma amostra de **73% (43.407)**. As categorias **newborn** e **elective** não são de interesse desse estudo, pois o paciente eletivo é um paciente que não está enfrentando uma condição de emergência ou risco à vida, podendo ser apenas uma consulta de rotina marcada com antecedência e, em relação ao pediátrico, as condições de sepse é diferente para esta população e, por isso, o objeto de estudo é a pessoa adulta com idade maior ou igual a 18 anos.
+
+```{r}
+ADMISSIONS_csv %>% 
+  janitor::tabyl(ADMISSION_TYPE)
+```
+
+A partir dessa caracterização de amostra, é necessário fazer o join com a base dados nomeada por **The patients table** e que contém as seguintes informações de interesse:
+
+- GENDER
+- DOB: é a data de nascimento do paciente fornecido.
+- DOD: é a data da morte do paciente fornecido.
+- DOD_HOSP: é a data da morte conforme registrada no banco de dados do hospital.
+- DOD_SSN: é a data da morte do banco de dados da previdência social.
+- EXPIRE_FLAG: é um sinalizador binário que indica se o paciente morreu, ou seja, se DODé nulo ou não.
 
 
 
 
 
-
-
-
-
-## 
+## The d_icd_diagnoses table
 
 ```{r}
 D_ICD_DIAGNOSES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_DIAGNOSES.csv.gz")
 ```
 
-## 
+## The d_icd_procedures table
 
 ```{r}
 D_ICD_PROCEDURES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_PROCEDURES.csv.gz")
