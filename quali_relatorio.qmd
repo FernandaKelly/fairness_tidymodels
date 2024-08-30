@@ -27,6 +27,8 @@ execute:
 library(tidyverse)
 library(yardstick)
 library(dplyr)
+library(lubridate)
+options(scipen = 999)
 ```
 
 # Leitura de dados
@@ -124,18 +126,28 @@ A partir dessa caracterização de amostra, é necessário fazer o join com a ba
 ```{r}
 ADMISSIONS_merge <- ADMISSIONS_csv %>% 
                     dplyr::left_join(PATIENTS_csv, by = "SUBJECT_ID")
+
+# ADMISSIONS_merge %>% 
+#   dplyr::mutate(idade_Anos = base::floor((lubridate::today() - DOB)/365.25))
 ```
-
-
-
-
-
-
-
 
 ```{r}
 ADMISSIONS_mergeDRG <- ADMISSIONS_merge %>% 
                     dplyr::left_join(DRGCODES_csv, by = "SUBJECT_ID")
+
+
+ADMISSIONS_mergeDRG %>% 
+  dplyr::distinct(SUBJECT_ID)
+```
+
+Em relação aos grupos etnícos, temos 41 grupos declarados. Suas porcentagens estão na tabela a seguir.
+
+```{r}
+ADMISSIONS_merge %>% 
+  janitor::tabyl(ETHNICITY)
+
+# ADMISSIONS_merge %>% 
+#   dplyr::distinct(ETHNICITY)
 ```
 
 
