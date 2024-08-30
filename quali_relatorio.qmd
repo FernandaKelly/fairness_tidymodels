@@ -150,6 +150,87 @@ ADMISSIONS_merge %>%
 #   dplyr::distinct(ETHNICITY)
 ```
 
+Agrupando aqueles que estão na mesma região, temos as seguintes porcentagens:
+
+```{r}
+ADMISSIONS_merge <- ADMISSIONS_merge %>% 
+                    dplyr::mutate(race_Agrupado =  dplyr::case_when(ETHNICITY == "AMERICAN INDIAN/ALASKA NATIVE" |
+                                                                    ETHNICITY == "AMERICAN INDIAN/ALASKA NATIVE FEDERALLY RECOGNIZED TRIBE" ~ "AMERICAN INDIAN",
+                                                                    
+                                                                    
+                                                                    ETHNICITY == "ASIAN" |
+                                                                    ETHNICITY == "ASIAN - ASIAN INDIAN" |
+                                                                    ETHNICITY == "ASIAN - CAMBODIAN" |
+                                                                    ETHNICITY == "ASIAN - CHINESE" |
+                                                                    ETHNICITY == "ASIAN - FILIPINO" |
+                                                                    ETHNICITY == "ASIAN - JAPANESE" |
+                                                                    ETHNICITY == "ASIAN - KOREAN" |
+                                                                    ETHNICITY == "ASIAN - OTHER" |
+                                                                    ETHNICITY == "ASIAN - THAI" |
+                                                                    ETHNICITY == "ASIAN - VIETNAMESE" ~ "ASIAN",
+                                                                    
+                                                                    ETHNICITY == "BLACK/AFRICAN" |
+                                                                    ETHNICITY == "BLACK/AFRICAN AMERICAN" |
+                                                                    ETHNICITY == "BLACK/CAPE VERDEAN" |
+                                                                    ETHNICITY == "BLACK/HAITIAN" ~ "BLACK",
+                                                                    
+                                                                    
+                                                                    ETHNICITY == "CARIBBEAN ISLAND" ~ "CARIBBEAN",
+                                                                    
+                                                                    
+                                                                    ETHNICITY == "HISPANIC OR LATINO" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - CENTRAL AMERICAN (OTHER)" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - COLOMBIAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - CUBAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - DOMINICAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - GUATEMALAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - HONDURAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - MEXICAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - PUERTO RICAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - SALVADORAN" ~ "HISPANIC/LATINO",
+                                                                    
+                                                                    ETHNICITY == "MIDDLE EASTERN" ~ "MIDDLE EASTERN",
+                                                                 
+                                                                    ETHNICITY == "NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER" ~ "PACIFIC ISLANDER",
+                                                                    ETHNICITY == "OTHER" | ETHNICITY == "UNKNOWN/NOT SPECIFIED" | ETHNICITY == "UNABLE TO OBTAIN" |
+                                                                    ETHNICITY == "PATIENT DECLINED TO ANSWER" | ETHNICITY == "MULTI RACE ETHNICITY" ~ "UNKNOWN",
+                                                                    
+                                                                    ETHNICITY == "PORTUGUESE" ~ "PORTUGUESE",
+                                                                    ETHNICITY == "SOUTH AMERICAN" ~ "SOUTH AMERICAN",
+                                                                    
+                                                                    
+                                                                    ETHNICITY == "WHITE" |
+                                                                    ETHNICITY == "WHITE - BRAZILIAN" |
+                                                                    ETHNICITY == "WHITE - EASTERN EUROPEAN" |
+                                                                    ETHNICITY == "WHITE - OTHER EUROPEAN" |
+                                                                    ETHNICITY == "WHITE - RUSSIAN" ~ "WHITE"
+                                                                    ))
+
+
+ADMISSIONS_merge %>% 
+  janitor::tabyl(race_Agrupado)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## The d_icd_diagnoses table
 
