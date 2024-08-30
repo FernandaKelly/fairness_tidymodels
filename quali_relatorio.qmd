@@ -118,7 +118,7 @@ A partir dessa caracterização de amostra, é necessário fazer o join com a ba
 - DOD: é a data da morte do paciente fornecido.
 - DOD_HOSP: é a data da morte conforme registrada no banco de dados do hospital.
 - DOD_SSN: é a data da morte do banco de dados da previdência social.
-- EXPIRE_FLAG: é um sinalizador binário que indica se o paciente morreu, ou seja, se DODé nulo ou não.
+- EXPIRE_FLAG: é um sinalizador binário que indica se o paciente morreu, ou seja, se DOD é nulo ou não.
 
 
 ```{r}
@@ -126,6 +126,17 @@ ADMISSIONS_merge <- ADMISSIONS_csv %>%
                     dplyr::left_join(PATIENTS_csv, by = "SUBJECT_ID")
 ```
 
+
+
+
+
+
+
+
+```{r}
+ADMISSIONS_mergeDRG <- ADMISSIONS_merge %>% 
+                    dplyr::left_join(DRGCODES_csv, by = "SUBJECT_ID")
+```
 
 
 ## The d_icd_diagnoses table
