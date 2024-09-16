@@ -211,7 +211,7 @@ ADMISSIONS_merge %>%
   janitor::tabyl(race_Agrupado)
 ```
 
-
+Veja que **70%** da base de dados é composta por observações de pessoas consideradas **White**, independente da região. O agrupamento feito para a categoria **BLACK** conta com **BLACK/AFRICAN**, **BLACK/AFRICAN AMERICAN**, **BLACK/CAPE VERDEAN** e **BLACK/HAITIAN**, totalizando **10%** das observações. 
 
 
 
