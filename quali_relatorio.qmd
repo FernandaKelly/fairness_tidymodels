@@ -1,0 +1,278 @@
+---
+title: "Previsão justa de diagnóstico de sepse: um estudo de caso de viés de algoritmo em aprendizado de máquina" # Título do relatório
+subtitle: "**Bases de dados e epistemicídios**"
+author: "Fernanda Kelly R. Silva | www.fernandakellyrs.com"
+lang: pt 
+date: "`r format(Sys.Date())`" 
+date-format: short 
+toc: true 
+format: 
+    html: 
+      embed-resources: true
+      #css: ["custom.css"] 
+      code-fold: false 
+      code-tools: true  
+      theme: 
+        light: cosmo
+        dark: superhero 
+#title-block-banner: "#874a9c" 
+code-annotations: hover 
+execute:
+  warning: false
+  message: false
+  echo: true
+---
+
+```{r}
+library(tidyverse)
+library(yardstick)
+library(dplyr)
+library(lubridate)
+options(scipen = 999)
+```
+
+# Leitura de dados
+
+## The admissions table
+
+```{r}
+ADMISSIONS_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/ADMISSIONS.csv.gz")
+```
+
+A tabela de dados de **admissão** possui 58976 observações. Ela fornece fornece informações sobre a admissão de um paciente no hospital. Como cada visita única ao hospital para um paciente recebe um **HADM_ID**, a tabela ADMISSIONS pode ser considerada uma tabela de definição para **HADM_ID**. As informações disponíveis incluem informações de tempo para admissão e alta, informações demográficas, a fonte da admissão e assim por diante.
+
+Há as seguintes variáveis na tabela de dados:
+
+-   ROW_ID
+
+-   SUBJECT_ID E HADM_ID: Cada linha desta tabela contém um HADM_ID, que representa a admissão de um único paciente no hospital. HADM_ID varia de 1000000 - 1999999. É possível que esta tabela tenha SUBJECT_ID, indicando que um único paciente teve várias admissões no hospital.
+
+-   ADMITTIME, DISCHTIME E DEATHTIME: ADMITTIME fornece a data e a hora em que o paciente foi admitido no hospital, enquanto DISCHTIME fornece a data e a hora em que o paciente recebeu alta do hospital. Se aplicável, DEATHTIME fornece a hora da morte do paciente no hospital. Observe que DEATHTIME está presente somente se o paciente morreu no hospital e é quase sempre o mesmo que o do paciente DISCHTIME.
+
+-   ADMISSION_TYPE: ADMISSION_TYPE descreve o tipo de admissão: 'ELETIVO', 'URGENTE', 'RECÉM-NASCIDO' ou 'EMERGÊNCIA'. Emergência/urgente indicam cuidados médicos não planejados e são frequentemente agrupados em uma única categoria em estudos. Eletivo indica uma admissão hospitalar previamente planejada. Recém-nascido indica que HADM_ID diz respeito ao nascimento do paciente.
+
+-   ADMISSION_LOCATION: ADMISSION_LOCATIONfornece informações sobre a localização anterior do paciente antes de chegar ao hospital. Existem 9 valores possíveis:
+
+    -   ADMISSÃO NO PRONTO-SISTEMA
+    -   TRANSFERÊNCIA DO HOSP/EXTRAM
+    -   TRANSFERÊNCIA DE OUTRO SERVIÇO DE SAÚDE
+    -   ENCAMINHAMENTO CLÍNICO/PREMATURO
+    -   **INFORMAÇÃO NÃO DISPONÍVEL**
+    -   TRANSFERÊNCIA DE ENFERMEIRO ESPECIALIZADO
+    -   TRSF DENTRO DESTA INSTALAÇÃO
+    -   REFERÊNCIA HMO/DOENTE
+    -   ENCAMINHAMENTO FÍSICO/DELI NORMAL
+
+-   DISCHARGE_LOCATION
+
+-   INSURANCE, LANGUAGE, RELIGION, MARITAL_STATUS e ETHNICITY: As colunas INSURANCE, LANGUAGE, RELIGION, MARITAL_STATUS, ETHNICITYdescrevem dados demográficos do paciente. Essas colunas ocorrem na tabela ADMISSIONS, pois são originalmente obtidas dos dados de admissão, alta e transferências (ADT) do banco de dados do hospital.
+
+-   EDREGTIME e EDOUTTIME: Horário em que o paciente foi registrado e recebeu alta do pronto-socorro.
+
+-   DIAGNOSIS: A DIAGNOSIS coluna fornece um diagnóstico preliminar de texto livre para o paciente na admissão hospitalar. O diagnóstico é geralmente atribuído pelo clínico que faz a admissão e não usa uma ontologia sistemática. A partir do MIMIC-III v1.0, havia 15.693 diagnósticos distintos para 58.976 admissões. Os diagnósticos podem ser muito informativos (por exemplo, insuficiência renal crônica) ou bastante vagos (por exemplo, fraqueza). Os diagnósticos finais para a internação hospitalar de um paciente são codificados na alta e podem ser encontrados na tabela DIAGNOSES_ICD. 
+
+-   HOSPITAL_EXPIRE_FLAG: Isso indica se o paciente morreu durante a hospitalização em questão, 1 indica morte no hospital e 0 indica sobrevivência até a alta hospitalar.
+
+-   HAS_CHARTEVENTS_DATA
+
+
+
+### Descritiva
+
+```{r}
+#| echo: false
+library(esquisse)
+```
+
+Na base de dados temos 58976 observações, mas vale ressaltar que um único paciente pode ter várias admissões e cada uma é uma observação no banco de dados. Sendo assim, temos **46.520 pacientes**. 
+
+```{r}
+ADMISSIONS_csv %>% 
+  dplyr::distinct(SUBJECT_ID) 
+```
+
+Inicialmente é importante entender quantos pacientes tiveram mais de uma admissão. De acordo com a tabela abaixo, **17% (7.537)** dos pacientes tiveram mais ou igual a 2 duas admissões. **Vale ressaltar que as admissões podem ter intervalos e causas diferentes.**.
+
+```{r} 
+ADMISSIONS_csv %>% 
+  dplyr::group_by(SUBJECT_ID) %>% 
+  dplyr::summarise(n_subject = n()) %>% 
+  dplyr::arrange(desc(n_subject)) %>% 
+  dplyr::filter(n_subject >=2) %>% 
+  dplyr::count()
+```
+
+Das admissões, no geral,  **71% (42.071)** são admissões de **emergência**. É esperado que **emergência** e **urgência** sejam agrupadas devida ao cenário de ambas serem similares e, se forem agrupadas, teremos uma amostra de **73% (43.407)**. As categorias **newborn** e **elective** não são de interesse desse estudo, pois o paciente eletivo é um paciente que não está enfrentando uma condição de emergência ou risco à vida, podendo ser apenas uma consulta de rotina marcada com antecedência e, em relação ao pediátrico, as condições de sepse é diferente para esta população e, por isso, o objeto de estudo é a pessoa adulta com idade maior ou igual a 18 anos.
+
+```{r}
+ADMISSIONS_csv %>% 
+  janitor::tabyl(ADMISSION_TYPE)
+```
+```{r}
+ADMISSIONS_csv <- ADMISSIONS_csv %>% 
+                  dplyr::filter(ADMISSION_TYPE == "EMERGENCY" | ADMISSION_TYPE == "URGENT")
+```
+
+A partir dessa caracterização de amostra, é necessário fazer o join com a base dados nomeada por **The patients table** e que contém as seguintes informações de interesse:
+
+- GENDER
+- DOB: é a data de nascimento do paciente fornecido.
+- DOD: é a data da morte do paciente fornecido.
+- DOD_HOSP: é a data da morte conforme registrada no banco de dados do hospital.
+- DOD_SSN: é a data da morte do banco de dados da previdência social.
+- EXPIRE_FLAG: é um sinalizador binário que indica se o paciente morreu, ou seja, se DOD é nulo ou não.
+
+
+```{r}
+ADMISSIONS_merge <- ADMISSIONS_csv %>% 
+                    dplyr::left_join(PATIENTS_csv, by = "SUBJECT_ID")
+
+# ADMISSIONS_merge %>% 
+#   dplyr::mutate(idade_Anos = base::floor((lubridate::today() - DOB)/365.25))
+```
+
+Em relação aos grupos étnicos, temos 41 grupos declarados. Suas porcentagens estão na tabela a seguir.
+
+```{r}
+ADMISSIONS_merge %>% 
+  janitor::tabyl(ETHNICITY)
+
+# ADMISSIONS_merge %>% 
+#   dplyr::distinct(ETHNICITY)
+```
+
+Agrupando aqueles que estão na mesma região, temos as seguintes porcentagens:
+
+```{r}
+ADMISSIONS_merge <- ADMISSIONS_merge %>% 
+                    dplyr::mutate(race_Agrupado =  dplyr::case_when(ETHNICITY == "AMERICAN INDIAN/ALASKA NATIVE" |
+                                                                    ETHNICITY == "AMERICAN INDIAN/ALASKA NATIVE FEDERALLY RECOGNIZED TRIBE" ~ "AMERICAN INDIAN",
+                                                                    
+                                                                    
+                                                                    ETHNICITY == "ASIAN" |
+                                                                    ETHNICITY == "ASIAN - ASIAN INDIAN" |
+                                                                    ETHNICITY == "ASIAN - CAMBODIAN" |
+                                                                    ETHNICITY == "ASIAN - CHINESE" |
+                                                                    ETHNICITY == "ASIAN - FILIPINO" |
+                                                                    ETHNICITY == "ASIAN - JAPANESE" |
+                                                                    ETHNICITY == "ASIAN - KOREAN" |
+                                                                    ETHNICITY == "ASIAN - OTHER" |
+                                                                    ETHNICITY == "ASIAN - THAI" |
+                                                                    ETHNICITY == "ASIAN - VIETNAMESE" ~ "ASIAN",
+                                                                    
+                                                                    ETHNICITY == "BLACK/AFRICAN" |
+                                                                    ETHNICITY == "BLACK/AFRICAN AMERICAN" |
+                                                                    ETHNICITY == "BLACK/CAPE VERDEAN" |
+                                                                    ETHNICITY == "BLACK/HAITIAN" ~ "BLACK",
+                                                                    
+                                                                    
+                                                                    ETHNICITY == "CARIBBEAN ISLAND" ~ "CARIBBEAN",
+                                                                    
+                                                                    
+                                                                    ETHNICITY == "HISPANIC OR LATINO" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - CENTRAL AMERICAN (OTHER)" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - COLOMBIAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - CUBAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - DOMINICAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - GUATEMALAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - HONDURAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - MEXICAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - PUERTO RICAN" |
+                                                                    ETHNICITY == "HISPANIC/LATINO - SALVADORAN" ~ "HISPANIC/LATINO",
+                                                                    
+                                                                    ETHNICITY == "MIDDLE EASTERN" ~ "MIDDLE EASTERN",
+                                                                 
+                                                                    ETHNICITY == "NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER" ~ "PACIFIC ISLANDER",
+                                                                    ETHNICITY == "OTHER" | ETHNICITY == "UNKNOWN/NOT SPECIFIED" | ETHNICITY == "UNABLE TO OBTAIN" |
+                                                                    ETHNICITY == "PATIENT DECLINED TO ANSWER" | ETHNICITY == "MULTI RACE ETHNICITY" ~ "UNKNOWN",
+                                                                    
+                                                                    ETHNICITY == "PORTUGUESE" ~ "PORTUGUESE",
+                                                                    ETHNICITY == "SOUTH AMERICAN" ~ "SOUTH AMERICAN",
+                                                                    
+                                                                    
+                                                                    ETHNICITY == "WHITE" |
+                                                                    ETHNICITY == "WHITE - BRAZILIAN" |
+                                                                    ETHNICITY == "WHITE - EASTERN EUROPEAN" |
+                                                                    ETHNICITY == "WHITE - OTHER EUROPEAN" |
+                                                                    ETHNICITY == "WHITE - RUSSIAN" ~ "WHITE"
+                                                                    ))
+
+
+ADMISSIONS_merge %>% 
+  janitor::tabyl(race_Agrupado)
+```
+
+Veja que **70%** da base de dados é composta por observações de pessoas consideradas **WHITE**, independente da região. O agrupamento feito para a categoria **BLACK** conta com **BLACK/AFRICAN**, **BLACK/AFRICAN AMERICAN**, **BLACK/CAPE VERDEAN** e **BLACK/HAITIAN**, totalizando **10%** das observações. 
+
+Já em relação ao sistema de saúde americano, existem dois programas de saúde disponibilizados pelo governo, mesmo que o único sistema de saúde disponível é o particular. Porém, quem está abaixo da linha da pobreza e idosos são assegurados por dois programas gratuitos: **Medicare** e **Medicaid**. Eles garantem atendimentos simples e de emergência e, claro, com suas limitações, tanto na cobertura quanto no atendimento.
+
+O **Medicare** foi criado em 1966 e é voltado para o público de 65 anos ou mais, pessoas com deficiência ou condições que impeçam de trabalhar. Contudo, os assegurados devem ter contribuído com o pagamento de impostos para a saúde enquanto trabalhavam, ou seja, o programa é financiado pela previdência do país. Esse programa inclui duas partes: Seguro Hospitalar (Parte A) e Seguro Médico (Parte B).
+
+Por sua vez, o **Medicaid** ser para atender pessoas abaixo da linha da pobreza. Esse programa é financiado pelo governo federal em conjunto com os estados.O problema são as exigências impostas. Com isso, milhares de pessoas que precisariam do Medicaid ficam de fora do programa. Além do mais, o serviço acaba sendo precário, pois o reembolso é baixo. Assim, muitos prestadores de serviços de saúde negam a cobertura. Pessoas com Medicaid podem receber cobertura para serviços que o Medicare não cobre ou cobre apenas parcialmente, como casas de repouso, assistência pessoal, transporte para serviços médicos, serviços em domicílio ou na comunidade e serviços ortodônticos, de visão e auditivos.
+
+No banco de dados MIMIC-III v1.0, temo a representação das seguintes formas de custear dos pacientes:
+
+```{r}
+ADMISSIONS_merge %>% 
+  janitor::tabyl(INSURANCE)
+```
+
+Veja que **56%** da amostra é composta por pessoas que utilizam o Medicare, já indicando uma população mais idosa (65 anos ou mais) e **30%** utilizam o Private. Fazendo uma associação entre grupos étnicos e formas de custeio.
+
+
+```{r}
+ADMISSIONS_merge %>% 
+janitor::tabyl(race_Agrupado,INSURANCE) %>% 
+janitor::adorn_totals(where = "row")
+```
+Observe que a associação entre grupos étnicos e a indicação de morte durante a hospitalização em questão, **9%** dos pacientes autodeclados como **BLACK** morreram e **1%** dos autodeclarados **WHITE** morreram. 
+
+```{r}
+ADMISSIONS_merge %>% 
+janitor::tabyl(race_Agrupado,HOSPITAL_EXPIRE_FLAG) %>% 
+janitor::adorn_totals(where = "col")
+```
+Daqueles que morreram, **61%** foram atendidos pelo Medicare e **71%**, respectivamente.
+
+```{r}
+ADMISSIONS_merge %>% 
+  dplyr::filter(HOSPITAL_EXPIRE_FLAG == 1) %>% 
+  janitor::tabyl(race_Agrupado, INSURANCE) %>% 
+  janitor::adorn_totals(where = "col")
+```
+
+```{r}
+ADMISSIONS_merge %>% 
+  dplyr::filter(HOSPITAL_EXPIRE_FLAG == 1) %>% 
+  janitor::tabyl(race_Agrupado, INSURANCE) %>% 
+  janitor::adorn_totals(where = "col")
+```
+
+
+```{r}
+ADMISSIONS_mergeCode <- ADMISSIONS_merge %>% 
+                    dplyr::left_join(D_ICD_DIAGNOSES_csv, by = c("ROW_ID.x" = "ROW_ID"))
+
+
+tabela1 <- ADMISSIONS_mergeCode %>% 
+  janitor::tabyl(ICD9_CODE, show_na = TRUE)
+
+DT::datatable(tabela1)
+
+ADMISSIONS_mergeCode %>% 
+  dplyr::filter(ICD9_CODE == "0038")
+
+```
+
+
+## The d_icd_diagnoses table
+
+```{r}
+D_ICD_DIAGNOSES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_DIAGNOSES.csv.gz")
+```
+
+## The d_icd_procedures table
+
+```{r}
+D_ICD_PROCEDURES_csv <- read_csv("C:/Users/fernanda.kelly/Downloads/D_ICD_PROCEDURES.csv.gz")
+```
